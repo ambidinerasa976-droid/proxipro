@@ -1,0 +1,3754 @@
+@extends('layouts.app')
+
+@section('title', 'Accueil - ProxiPro')
+
+{{-- DEBUG: Fichier feed/index.blade.php modifié le 01/02/2026 - Version optimisée --}}
+
+@push('styles')
+<style>
+    /* =========================================
+       NOUVELLE PAGE D'ACCUEIL - STYLE MARKETPLACE
+       Version optimisée - Espaces réduits
+       ========================================= */
+    :root {
+        --primary: #3a86ff;
+        --primary-dark: #2667cc;
+        --primary-light: rgba(58, 134, 255, 0.1);
+        --secondary: #8338ec;
+        --accent: #ffbe0b;
+        --bg-body: #f8fafc;
+        --text-dark: #1e293b;
+        --text-light: #64748b;
+        --white: #ffffff;
+        --border: #e2e8f0;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* =========================================
+       HERO SECTION - Plus compacte
+       ========================================= */
+    .hero-shape-1 {
+        position: absolute; top: 0; right: 0; width: 15rem; height: 15rem;
+        border-radius: 9999px; background-color: rgba(99, 102, 241, 0.4);
+        filter: blur(50px); transform: translate(5rem, -5rem);
+    }
+    .hero-shape-2 {
+        position: absolute; bottom: 0; left: 0; width: 12rem; height: 12rem;
+        border-radius: 9999px; background-color: rgba(168, 85, 247, 0.3);
+        filter: blur(40px); transform: translate(-3rem, 3rem);
+    }
+
+    .hero-greeting {
+        color: white;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    .hero-greeting h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .hero-greeting h1 span {
+        color: #60a5fa;
+    }
+    .hero-subtitle {
+        color: #c7d2fe;
+        font-size: 0.85rem;
+        margin-top: 0.15rem;
+    }
+
+    /* =========================================
+       BARRE DE FILTRES - Fixée au header
+       ========================================= */
+    .filter-bar-container {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 0;
+        position: fixed;
+        top: 90px; /* Juste en dessous du header */
+        left: 0;
+        right: 0;
+        z-index: 999;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Spacer pour compenser la barre fixe */
+    .filter-bar-spacer {
+        height: 70px;
+    }
+
+    /* Hero section compacte repositionnée */
+    .hero-section-compact {
+        background: linear-gradient(135deg, #312e81 0%, #4f46e5 100%);
+        padding: 1rem 0 1.25rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Boutons dropdown de filtre */
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+    }
+
+    .filter-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .filter-btn i {
+        font-size: 0.8rem;
+    }
+
+    .filter-btn .chevron {
+        margin-left: 4px;
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+    }
+
+    .filter-dropdown.open .filter-btn .chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Menu dropdown */
+    .filter-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 220px;
+        max-height: 320px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+    }
+
+    .filter-dropdown.open .filter-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .filter-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #475569;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .filter-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .filter-menu-item:hover {
+        background: #f8fafc;
+    }
+
+    .filter-menu-item.selected {
+        background: #eff6ff;
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .filter-menu-item i {
+        width: 20px;
+        color: #94a3b8;
+    }
+
+    .filter-menu-item.selected i {
+        color: var(--primary);
+    }
+
+    /* Toggle Buttons - Je cherche un Pro / Je cherche une mission */
+    .toggle-group {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 25px;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .toggle-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+        color: #64748b;
+    }
+
+    .toggle-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(58, 134, 255, 0.3);
+    }
+
+    .toggle-btn:hover:not(.active) {
+        background: #e2e8f0;
+    }
+
+    /* Séparateur vertical */
+    .filter-separator {
+        width: 1px;
+        height: 28px;
+        background: #e2e8f0;
+        margin: 0 4px;
+    }
+
+    /* Bouton Publier une offre dans la barre de filtre */
+    .btn-publish-offer {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        margin-left: auto;
+        background: linear-gradient(135deg, #3a86ff, #2667cc);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(58, 134, 255, 0.3);
+        white-space: nowrap;
+    }
+
+    .btn-publish-offer:hover {
+        background: linear-gradient(135deg, #2667cc, #1a4a99);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+    }
+
+    .btn-publish-offer i {
+        font-size: 0.9rem;
+    }
+
+    /* =========================================
+       CONTENEUR PRINCIPAL
+       ========================================= */
+    .content-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px 20px;
+        background: var(--bg-body); /* Même couleur que le body */
+        min-height: calc(100vh - 200px);
+    }
+
+    /* Layout 2 colonnes: Feed + Top Pros */
+    .feed-layout {
+        display: flex;
+        gap: 24px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: 20px;
+        justify-content: flex-end;
+    }
+
+    .feed-main {
+        flex: 0 1 650px;
+        min-width: 0;
+    }
+
+    .feed-sidebar {
+        flex: 0 0 300px;
+        width: 300px;
+        max-width: 300px;
+        position: sticky;
+        top: 160px;
+        height: fit-content;
+        align-self: flex-start;
+    }
+
+    @media (max-width: 992px) {
+        .feed-layout {
+            flex-direction: column;
+        }
+        .feed-main {
+            flex: 1 1 100%;
+        }
+        .feed-sidebar {
+            display: none;
+        }
+    }
+
+    /* Grille des cartes prestataires */
+    .providers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    /* Carte prestataire - Style Marketplace */
+    .provider-card {
+        background: transparent;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .provider-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .provider-image-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .provider-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .provider-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .provider-badge-top {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(138, 43, 226, 0.85);
+        backdrop-filter: blur(4px);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .provider-card-info {
+        padding: 8px 2px;
+    }
+
+    .provider-info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .provider-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d3436;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+    }
+
+    .provider-price {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3436;
+    }
+
+    .badge-pro {
+        background: #0084ff;
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+
+    .provider-rating {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .star-icon {
+        color: #fdcb6e;
+        margin-right: 4px;
+        font-weight: bold;
+    }
+
+    .rating-value {
+        font-weight: 700;
+        color: #2d3436;
+    }
+
+    .reviews-count {
+        color: #636e72;
+        margin-left: 6px;
+    }
+
+    .provider-category {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    /* =========================================
+       CARTE PUBLICATION (MISSION) - Style Facebook/LinkedIn
+       ========================================= */
+    .missions-feed {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mission-card {
+        background: white;
+        border-radius: 10px;
+        overflow: visible;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        position: relative;
+    }
+
+    .mission-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .mission-card-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .mission-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+
+    .mission-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .mission-user-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .mission-user-info {
+        flex: 1;
+    }
+
+    .mission-user-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .mission-meta {
+        font-size: 0.8rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mission-card-body {
+        padding: 10px 14px 12px;
+    }
+
+    .mission-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 6px;
+        line-height: 1.35;
+    }
+
+    .mission-description {
+        color: #475569;
+        font-size: 0.875rem;
+        line-height: 1.55;
+        margin-bottom: 8px;
+    }
+
+    /* Multi-photos container - Style Facebook */
+    .mission-photos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .mission-photos.single-photo {
+        grid-template-columns: 1fr;
+    }
+
+    .mission-photos.single-photo .mission-photo {
+        height: 260px;
+    }
+
+    .mission-photos.two-photos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mission-photo {
+        height: 160px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        background: #e2e8f0;
+        display: block;
+        text-decoration: none;
+    }
+
+    .mission-photos.single-photo .mission-photo {
+        height: 280px;
+    }
+
+    .mission-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s;
+        display: block;
+    }
+
+    .mission-photo:hover img {
+        transform: scale(1.03);
+    }
+
+    .mission-photo-more {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* =========================================
+       STATS INLINE BADGES
+       ========================================= */
+    .mission-stats-inline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #65676b;
+        font-size: 0.8rem;
+    }
+
+    .stat-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .stat-badge i {
+        font-size: 0.75rem;
+    }
+
+    /* =========================================
+       PHOTO LIGHTBOX
+       ========================================= */
+    .photo-lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .photo-lightbox.active {
+        display: flex;
+    }
+
+    .photo-lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .photo-lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .photo-lightbox img {
+        max-width: 95%;
+        max-height: 95%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .photo-lightbox-title {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 8px 20px;
+        border-radius: 20px;
+        max-width: 80%;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* =========================================
+       BOUTON 3 POINTS (MENU)
+       ========================================= */
+    .btn-three-dots {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: #65676b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .btn-three-dots:hover {
+        background: #f0f2f5;
+    }
+
+    .btn-three-dots i {
+        font-size: 1rem;
+    }
+
+    /* =========================================
+       BOUTONS ACTIONS SOCIALES AMÉLIORÉS
+       ========================================= */
+    .mission-actions {
+        display: flex;
+        justify-content: space-around;
+        padding: 6px 12px;
+        border-top: 1px solid #f1f5f9;
+        background: white;
+        gap: 6px;
+        position: relative;
+        z-index: 5;
+    }
+
+    .mission-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 10px;
+        border: none;
+        background: transparent;
+        color: #65676b;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        flex: 0 1 auto;
+    }
+
+    .mission-action-btn:hover {
+        background: #f0f2f5;
+        color: #1e293b;
+    }
+
+    .mission-action-btn.liked {
+        color: #dc2626;
+        background: #fef2f2;
+    }
+
+    .mission-action-btn.liked i {
+        animation: pulse 0.3s ease;
+    }
+
+    .mission-action-btn.active-comments {
+        color: var(--primary);
+        background: #eff6ff;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    /* =========================================
+       MENU DE PARTAGE AMÉLIORÉ
+       ========================================= */
+    .share-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        transform: scale(0.95);
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        padding: 12px;
+        min-width: 220px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    .share-menu.open {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+    }
+
+    .share-menu-header {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        padding: 8px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 8px;
+    }
+
+    .share-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-size: 0.9rem;
+        color: #1e293b;
+    }
+
+    .share-option:hover {
+        background: #f8fafc;
+    }
+
+    .share-option i {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .share-option.copy i { background: #f1f5f9; color: #64748b; }
+    .share-option.twitter i { background: #e0f2fe; color: #0ea5e9; }
+    .share-option.facebook i { background: #dbeafe; color: #2563eb; }
+    .share-option.linkedin i { background: #e0e7ff; color: #4f46e5; }
+    .share-option.whatsapp i { background: #dcfce7; color: #16a34a; }
+
+    .share-option.copied {
+        color: #16a34a;
+    }
+
+    .share-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+
+    .mission-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 14px;
+        color: #65676b;
+        font-size: 0.8rem;
+    }
+
+    .mission-stats span {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .mission-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: white;
+    }
+
+    .mission-price {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #059669;
+        background: #ecfdf5;
+        padding: 5px 12px;
+        border-radius: 18px;
+    }
+
+    .mission-badges {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .mission-badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .mission-badge-urgent {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .mission-badge-category {
+        background: #eff6ff;
+        color: var(--primary);
+    }
+
+    /* =========================================
+       SIDEBAR TOP PROS
+       ========================================= */
+    .top-pros-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .top-pros-header {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .top-pros-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .top-pros-header h3 i {
+        color: #eab308;
+    }
+
+    .top-pros-list {
+        padding: 8px 0;
+    }
+
+    .top-pro-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+    }
+
+    .top-pro-item:hover {
+        background: #f8fafc;
+    }
+
+    .top-pro-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 2px solid #e2e8f0;
+    }
+
+    .top-pro-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .top-pro-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .top-pro-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .top-pro-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .top-pro-category {
+        font-size: 0.75rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .top-pro-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+    }
+
+    .top-pro-rating .star {
+        color: #eab308;
+    }
+
+    .top-pro-rating span {
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .top-pro-rank {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .top-pro-rank.gold {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: white;
+    }
+
+    .top-pro-rank.silver {
+        background: linear-gradient(135deg, #9ca3af, #6b7280);
+        color: white;
+    }
+
+    .top-pro-rank.bronze {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        color: white;
+    }
+
+    .top-pro-rank.normal {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .top-pros-footer {
+        padding: 12px 16px;
+        border-top: 1px solid #f1f5f9;
+        text-align: center;
+    }
+
+    .top-pros-footer a {
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .top-pros-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* =========================================
+       SECTION VIDE
+       ========================================= */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: #475569;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* =========================================
+       RESPONSIVE
+       ========================================= */
+    @media (max-width: 768px) {
+        .filter-bar {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 8px;
+        }
+
+        .toggle-group {
+            order: -1;
+            flex-shrink: 0;
+        }
+
+        .providers-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .mission-photos {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .providers-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* =========================================
+       LOADING STATE
+       ========================================= */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+
+    .loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* =========================================
+       SECTION COMMENTAIRES INLINE AMÉLIORÉE
+       ========================================= */
+    .comments-section-inline {
+        display: none;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        border-radius: 0 0 16px 16px;
+        overflow: hidden;
+        animation: slideDown 0.3s ease;
+    }
+
+    .comments-section-inline.open {
+        display: block;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comments-header {
+        padding: 14px 16px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .comments-header h5 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comments-close-btn {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 50%;
+        transition: all 0.2s;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .comments-close-btn:hover {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .comments-list-inline {
+        max-height: 350px;
+        overflow-y: auto;
+        padding: 12px 16px;
+    }
+
+    .comment-item-inline {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        animation: fadeInComment 0.3s ease;
+    }
+
+    .comment-item-inline:last-child {
+        margin-bottom: 0;
+    }
+
+    @keyframes fadeInComment {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comment-avatar-inline {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .comment-avatar-inline img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .comment-avatar-placeholder-inline {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .comment-content-inline {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .comment-bubble {
+        background: white;
+        border-radius: 12px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .comment-author-inline {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .comment-author-inline:hover {
+        color: var(--primary);
+    }
+
+    .comment-text-inline {
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.5;
+        word-break: break-word;
+        margin: 0;
+    }
+
+    .comment-actions-inline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 6px;
+        padding-left: 4px;
+    }
+
+    .comment-action-btn {
+        font-size: 0.75rem;
+        color: #64748b;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+    }
+
+    .comment-action-btn:hover {
+        color: var(--primary);
+        background: #eff6ff;
+    }
+
+    .comment-action-btn.liked {
+        color: #dc2626;
+    }
+
+    .comment-time-inline {
+        font-size: 0.7rem;
+        color: #94a3b8;
+    }
+
+    .comments-form-inline {
+        padding: 14px 16px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .comment-input-wrapper {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #f1f5f9;
+        border-radius: 24px;
+        padding: 4px 4px 4px 16px;
+    }
+
+    .comment-input-inline {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 0.9rem;
+        outline: none;
+        padding: 8px 0;
+        color: #1e293b;
+        min-height: 20px;
+    }
+
+    .comment-input-inline::placeholder {
+        color: #94a3b8;
+    }
+
+    .comment-submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .comment-submit-btn:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: scale(1.05);
+    }
+
+    .comment-submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .no-comments-inline {
+        text-align: center;
+        padding: 30px 20px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .no-comments-inline i {
+        font-size: 2rem;
+        margin-bottom: 12px;
+        display: block;
+        color: #cbd5e1;
+    }
+
+    .login-to-comment {
+        text-align: center;
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .login-to-comment a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-to-comment a:hover {
+        text-decoration: underline;
+    }
+
+    /* Voir plus de commentaires */
+    .load-more-comments {
+        text-align: center;
+        padding: 12px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .load-more-comments:hover {
+        background: #f8fafc;
+    }
+
+    /* =========================================
+       TOAST NOTIFICATIONS AMÉLIORÉES
+       ========================================= */
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toast-custom {
+        background: white;
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 280px;
+        animation: slideInToast 0.3s ease;
+    }
+
+    @keyframes slideInToast {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .toast-custom.success {
+        border-left: 4px solid #22c55e;
+    }
+
+    .toast-custom.error {
+        border-left: 4px solid #ef4444;
+    }
+
+    .toast-custom.info {
+        border-left: 4px solid var(--primary);
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .toast-custom.success .toast-icon {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .toast-custom.error .toast-icon {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .toast-custom.info .toast-icon {
+        background: #eff6ff;
+        color: var(--primary);
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 2px;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        transition: all 0.15s;
+    }
+
+    .toast-close:hover {
+        background: #f1f5f9;
+        color: #475569;
+    }
+</style>
+@endpush
+
+@section('content')
+<!-- Barre de Filtres (fixée au header) -->
+<div class="filter-bar-container">
+    <div class="filter-bar">
+        <!-- Toggle Pro / Offre -->
+        <div class="toggle-group">
+            <button class="toggle-btn" id="togglePro" onclick="setViewMode('providers')">
+                <i class="fas fa-user-tie me-1"></i> Je cherche un Pro
+            </button>
+            <button class="toggle-btn active" id="toggleMission" onclick="setViewMode('missions')">
+                <i class="fas fa-briefcase me-1"></i> Je cherche une offre
+            </button>
+        </div>
+
+        <div class="filter-separator"></div>
+
+        <!-- Catégorie -->
+        <div class="filter-dropdown" id="categoryDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('categoryDropdown')">
+                <i class="fas fa-folder"></i>
+                <span id="categoryLabel">Catégorie</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" id="categoryMenu">
+                <div class="filter-menu-item selected" data-value="" onclick="selectCategory('')">
+                    <i class="fas fa-check"></i> Toutes les catégories
+                </div>
+                @foreach($missionCategories as $catName => $catData)
+                <div class="filter-menu-item" data-value="{{ $catName }}" onclick="selectCategory('{{ $catName }}')">
+                    <i class="{{ $catData['icon'] ?? 'fas fa-folder' }}"></i> {{ $catName }}
+                    <span class="ms-auto text-muted small">{{ $catData['total'] ?? 0 }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Sous-catégorie -->
+        <div class="filter-dropdown" id="subcategoryDropdown" style="display: none;">
+            <button class="filter-btn" onclick="toggleDropdown('subcategoryDropdown')">
+                <i class="fas fa-tags"></i>
+                <span id="subcategoryLabel">Sous-catégorie</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" id="subcategoryMenu">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Filtre par -->
+        <div class="filter-dropdown" id="sortDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('sortDropdown')">
+                <i class="fas fa-sort-amount-down"></i>
+                <span id="sortLabel">Trier</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu">
+                <div class="filter-menu-item selected" data-value="recommended" onclick="selectSort('recommended')">
+                    <i class="fas fa-star"></i> Recommandé
+                </div>
+                <div class="filter-menu-item" data-value="recent" onclick="selectSort('recent')">
+                    <i class="fas fa-clock"></i> Plus récent
+                </div>
+                <div class="filter-menu-item" data-value="urgent" onclick="selectSort('urgent')">
+                    <i class="fas fa-bolt"></i> Urgent
+                </div>
+            </div>
+        </div>
+
+        <!-- Localisation -->
+        <div class="filter-dropdown" id="locationDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('locationDropdown')">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="locationLabel">Localisation</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" style="min-width: 280px;">
+                <div style="padding: 12px;">
+                    <label class="form-label small text-muted mb-1">Pays</label>
+                    <select class="form-select form-select-sm mb-2" id="countrySelect" onchange="updateFilterCities()">
+                        <option value="">-- Sélectionner un pays --</option>
+                        <optgroup label="France - Outre-mer">
+                            <option value="Mayotte">Mayotte</option>
+                            <option value="La Réunion">La Réunion</option>
+                            <option value="Guadeloupe">Guadeloupe</option>
+                            <option value="Martinique">Martinique</option>
+                            <option value="Guyane">Guyane</option>
+                        </optgroup>
+                        <optgroup label="Océan Indien">
+                            <option value="Comores">Comores</option>
+                            <option value="Madagascar">Madagascar</option>
+                            <option value="Maurice">Maurice</option>
+                        </optgroup>
+                        <optgroup label="Europe">
+                            <option value="France">France</option>
+                            <option value="Belgique">Belgique</option>
+                            <option value="Suisse">Suisse</option>
+                        </optgroup>
+                        <optgroup label="Afrique">
+                            <option value="Sénégal">Sénégal</option>
+                            <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                            <option value="Maroc">Maroc</option>
+                            <option value="Tunisie">Tunisie</option>
+                            <option value="Algérie">Algérie</option>
+                        </optgroup>
+                        <optgroup label="Amérique">
+                            <option value="Canada">Canada</option>
+                        </optgroup>
+                    </select>
+                    
+                    <label class="form-label small text-muted mb-1">Ville</label>
+                    <select class="form-select form-select-sm mb-2" id="citySelect" disabled>
+                        <option value="">-- Sélectionner une ville --</option>
+                    </select>
+                    
+                    <div id="customCityWrapper" style="display: none;">
+                        <input type="text" class="form-control form-control-sm mb-2" placeholder="Saisir une ville" id="cityInput">
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="resetLocationFilter()">
+                            <i class="fas fa-times me-1"></i> Réinitialiser
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-grow-1" onclick="applyLocationFilter()">
+                            <i class="fas fa-check me-1"></i> Appliquer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prix -->
+        <div class="filter-dropdown" id="priceDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('priceDropdown')">
+                <i class="fas fa-euro-sign"></i>
+                <span id="priceLabel">Prix</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" style="min-width: 250px;">
+                <div style="padding: 12px;">
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Min €" id="priceMin">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Max €" id="priceMax">
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(0, 50)">0-50€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(50, 100)">50-100€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(100, 500)">100-500€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(500, null)">500€+</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="resetPriceFilter()">
+                            <i class="fas fa-times me-1"></i> Réinitialiser
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-grow-1" onclick="applyPriceFilter()">
+                            <i class="fas fa-check me-1"></i> Appliquer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Spacer pour compenser la barre fixe -->
+<div class="filter-bar-spacer"></div>
+
+<!-- Hero Section Compact (après la barre de filtres) -->
+<div class="hero-section-compact">
+    <div class="hero-shape-1"></div>
+    <div class="hero-shape-2"></div>
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="hero-greeting">
+            <h1>Bonjour <span>{{ explode(' ', Auth::user()->name ?? 'Vous')[0] }}</span> 👋</h1>
+            <p class="hero-subtitle">Trouvez des prestataires ou des missions près de chez vous</p>
+        </div>
+    </div>
+</div>
+
+<!-- Contenu Principal -->
+<div class="content-container">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Section Prestataires (cachée par défaut) -->
+    <div id="providersSection" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1" id="providersSectionTitle">Nos meilleurs prestataires</h2>
+                <p class="text-muted mb-0" id="providersSectionSubtitle">Professionnels vérifiés et recommandés</p>
+            </div>
+        </div>
+        <div class="providers-grid" id="providersGrid">
+            @if(isset($premiumPros) && $premiumPros->count() > 0)
+                @foreach($premiumPros as $pro)
+                <a href="{{ route('profile.public', $pro->id) }}" class="provider-card">
+                    <div class="provider-image-wrapper">
+                        @if($pro->avatar)
+                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}">
+                        @else
+                            <div class="provider-image-placeholder">
+                                {{ strtoupper(substr($pro->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        @if($pro->plan && $pro->plan !== 'free')
+                        <div class="provider-badge-top">💜 Top prestataire</div>
+                        @endif
+                    </div>
+                    <div class="provider-card-info">
+                        <div class="provider-info-header">
+                            <h3 class="provider-name">
+                                {{ Str::limit($pro->name, 18) }}
+                                @if($pro->user_type === 'professionnel')
+                                <span class="badge-pro">PRO</span>
+                                @endif
+                            </h3>
+                            @if($pro->hourly_rate)
+                            <span class="provider-price">{{ $pro->hourly_rate }} €/h</span>
+                            @endif
+                        </div>
+                        <div class="provider-rating">
+                            <span class="star-icon">★</span>
+                            <span class="rating-value">{{ number_format($pro->reviews_avg_rating ?? rand(40, 50) / 10, 1, ',', '') }}</span>
+                            <span class="reviews-count">({{ $pro->reviews_count ?? rand(50, 500) }} avis)</span>
+                        </div>
+                        @if($pro->bio)
+                        <p class="provider-category">{{ Str::limit($pro->bio, 40) }}</p>
+                        @endif
+                    </div>
+                </a>
+                @endforeach
+            @else
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-users"></i>
+                    <h3>Aucun prestataire disponible</h3>
+                    <p>Revenez bientôt pour découvrir nos professionnels</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Section Missions (affichée par défaut) -->
+    <div id="missionsSection">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold mb-1" id="missionsSectionTitle">Dernières missions disponibles</h2>
+            <p class="text-muted mb-0" id="missionsSectionSubtitle">Trouvez des opportunités près de chez vous</p>
+        </div>
+        
+        <!-- Layout 2 colonnes: Feed + Top Pros -->
+        <div class="feed-layout">
+            <!-- Colonne principale: Feed des missions -->
+            <div class="feed-main">
+                <div class="missions-feed" id="missionsGrid">
+            @forelse($ads as $ad)
+            <div class="mission-card" data-ad-id="{{ $ad->id }}">
+                <!-- En-tête avec avatar et infos utilisateur -->
+                <div class="mission-card-header">
+                    <a href="{{ route('profile.public', $ad->user_id) }}" class="mission-user-avatar">
+                        @if($ad->user && $ad->user->avatar)
+                            <img src="{{ asset('storage/' . $ad->user->avatar) }}" alt="{{ $ad->user->name }}">
+                        @else
+                            <div class="mission-user-avatar-placeholder">
+                                {{ strtoupper(substr($ad->user->name ?? 'U', 0, 1)) }}
+                            </div>
+                        @endif
+                    </a>
+                    <div class="mission-user-info">
+                        <a href="{{ route('profile.public', $ad->user_id) }}" class="mission-user-name text-decoration-none">
+                            {{ $ad->user->name ?? 'Utilisateur' }}
+                        </a>
+                        <div class="mission-meta">
+                            <span>{{ $ad->created_at->diffForHumans() }}</span>
+                            <span>·</span>
+                            <span><i class="fas fa-map-marker-alt me-1"></i>{{ $ad->city ?? $ad->location ?? 'France' }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown ms-auto">
+                        <button class="btn-three-dots" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{{ route('ads.show', $ad) }}"><i class="fas fa-eye me-2 text-primary"></i>Voir les détails</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="saveAd({{ $ad->id }}); return false;"><i class="far fa-bookmark me-2 text-warning"></i>Sauvegarder</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.public', $ad->user_id) }}"><i class="fas fa-user me-2 text-info"></i>Voir le profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#reportModal{{ $ad->id }}"><i class="fas fa-flag me-2"></i>Signaler la publication</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-eye-slash me-2 text-muted"></i>Masquer cette annonce</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Modal Signaler -->
+                <div class="modal fade" id="reportModal{{ $ad->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><i class="fas fa-flag text-danger me-2"></i>Signaler cette publication</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted mb-3">Pourquoi souhaitez-vous signaler cette publication ?</p>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-secondary text-start" onclick="submitReport({{ $ad->id }}, 'spam')">
+                                        <i class="fas fa-ban me-2"></i>Spam ou arnaque
+                                    </button>
+                                    <button class="btn btn-outline-secondary text-start" onclick="submitReport({{ $ad->id }}, 'inappropriate')">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Contenu inapproprié
+                                    </button>
+                                    <button class="btn btn-outline-secondary text-start" onclick="submitReport({{ $ad->id }}, 'fake')">
+                                        <i class="fas fa-user-secret me-2"></i>Fausse annonce
+                                    </button>
+                                    <button class="btn btn-outline-secondary text-start" onclick="submitReport({{ $ad->id }}, 'other')">
+                                        <i class="fas fa-ellipsis-h me-2"></i>Autre raison
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contenu de la publication -->
+                <div class="mission-card-body">
+                    <a href="{{ route('ads.show', $ad) }}" class="text-decoration-none">
+                        <h4 class="mission-title">{{ $ad->title }}</h4>
+                    </a>
+                    <p class="mission-description">{{ Str::limit($ad->description, 150) }}</p>
+                    
+                    <!-- Badges catégorie et prix -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="mission-badges">
+                            <span class="mission-badge mission-badge-category">{{ $ad->category }}</span>
+                            @if($ad->is_urgent)
+                            <span class="mission-badge mission-badge-urgent"><i class="fas fa-bolt me-1"></i>Urgent</span>
+                            @endif
+                        </div>
+                        <span class="mission-price">
+                            {{ $ad->price ? number_format($ad->price, 0, ',', ' ') . ' €' : 'Sur devis' }}
+                        </span>
+                    </div>
+                    
+                    <!-- Photos -->
+                    @php
+                        // Le model a déjà le cast 'photos' => 'array'
+                        $photos = $ad->photos ?? [];
+                        if (is_string($photos)) {
+                            $decoded = json_decode($photos, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                $photos = $decoded;
+                            } elseif (trim($photos) !== '') {
+                                $photos = [$photos];
+                            } else {
+                                $photos = [];
+                            }
+                        } elseif (!is_array($photos)) {
+                            $photos = (array) $photos;
+                        }
+                        $photos = array_values(array_filter($photos));
+                        $photoCount = count($photos);
+                    @endphp
+                    
+                    @if($photoCount > 0)
+                    <div class="mission-photos {{ $photoCount == 1 ? 'single-photo' : ($photoCount == 2 ? 'two-photos' : '') }}">
+                        @foreach(array_slice($photos, 0, 3) as $index => $photo)
+                        @php
+                            // Nettoyer le chemin
+                            $photoPath = trim($photo);
+                            $photoPath = ltrim($photoPath, '/');
+                            
+                            // Construire l'URL
+                            if (str_starts_with($photoPath, 'http://') || str_starts_with($photoPath, 'https://')) {
+                                $photoUrl = $photoPath;
+                            } elseif (str_starts_with($photoPath, 'storage/')) {
+                                $photoUrl = asset($photoPath);
+                            } elseif (str_starts_with($photoPath, 'public/')) {
+                                $photoUrl = asset('storage/' . str_replace('public/', '', $photoPath));
+                            } else {
+                                // Par défaut: ads/xxx.jpg -> /storage/ads/xxx.jpg
+                                $photoUrl = asset('storage/' . $photoPath);
+                            }
+                        @endphp
+                        <div class="mission-photo" onclick="openPhotoLightbox('{{ $photoUrl }}', '{{ addslashes($ad->title) }}')" style="cursor: pointer;">
+                            <img src="{{ $photoUrl }}"
+                                 alt="{{ $ad->title }}"
+                                 style="width:100%;height:100%;object-fit:cover;display:block;"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <div class="photo-error" style="display:none;width:100%;height:100%;background:#f1f5f9;align-items:center;justify-content:center;color:#94a3b8;">
+                                <i class="fas fa-image fa-2x"></i>
+                            </div>
+                            @if($index == 1 && $photoCount > 2)
+                            <div class="mission-photo-more">+{{ $photoCount - 2 }}</div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+                
+                <!-- Stats (likes) -->
+                <div class="mission-stats">
+                    <div class="mission-stats-left">
+                        <span class="stat-item likes" id="likes-count-{{ $ad->id }}" style="display: none;">
+                            <i class="fas fa-heart" style="color: #dc2626;"></i>
+                            <span class="likes-number">0</span>
+                        </span>
+                    </div>
+                    <div class="mission-stats-right"></div>
+                </div>
+                
+                <!-- Boutons d'actions sociales - J'aime, Commenter, Partager -->
+                <div class="mission-actions">
+                    <button class="mission-action-btn" id="like-btn-{{ $ad->id }}" onclick="toggleLike({{ $ad->id }})">
+                        <i class="far fa-heart"></i>
+                        <span>J'aime</span>
+                    </button>
+                    <button class="mission-action-btn" id="comment-btn-{{ $ad->id }}" onclick="toggleComments({{ $ad->id }})">
+                        <i class="far fa-comment"></i>
+                        <span><span class="comments-count-{{ $ad->id }}">{{ $ad->comments()->count() }}</span> Commenter</span>
+                    </button>
+                    <div class="share-wrapper">
+                        <button class="mission-action-btn" onclick="toggleShareMenu({{ $ad->id }}, this)">
+                            <i class="fas fa-share"></i>
+                            <span><span class="shares-count-{{ $ad->id }}">{{ $ad->shares_count ?? 0 }}</span> Partager</span>
+                        </button>
+                        <!-- Menu de partage -->
+                        <div class="share-menu" id="share-menu-{{ $ad->id }}">
+                            <div class="share-menu-header">Partager</div>
+                            <div class="share-option copy" onclick="copyLink({{ $ad->id }})">
+                                <i class="fas fa-link"></i>
+                                <span>Copier le lien</span>
+                            </div>
+                            <div class="share-option twitter" onclick="shareTo('twitter', {{ $ad->id }}, '{{ addslashes($ad->title) }}')">
+                                <i class="fab fa-twitter"></i>
+                                <span>Twitter</span>
+                            </div>
+                            <div class="share-option facebook" onclick="shareTo('facebook', {{ $ad->id }})">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </div>
+                            <div class="share-option linkedin" onclick="shareTo('linkedin', {{ $ad->id }})">
+                                <i class="fab fa-linkedin-in"></i>
+                                <span>LinkedIn</span>
+                            </div>
+                            <div class="share-option whatsapp" onclick="shareTo('whatsapp', {{ $ad->id }}, '{{ addslashes($ad->title) }}')">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Commentaires Inline -->
+                <div class="comments-section-inline" id="comments-section-{{ $ad->id }}">
+                    <div class="comments-header">
+                        <h5><i class="far fa-comments"></i> Commentaires</h5>
+                        <button class="comments-close-btn" onclick="toggleComments({{ $ad->id }})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Liste des commentaires -->
+                    <div class="comments-list-inline" id="comments-list-{{ $ad->id }}">
+                        @php 
+                            $adComments = $ad->comments()->whereNull('parent_id')->with('user')->orderBy('created_at', 'desc')->take(5)->get();
+                        @endphp
+                        
+                        @forelse($adComments as $comment)
+                        <div class="comment-item-inline" data-comment-id="{{ $comment->id }}">
+                            <div class="comment-avatar-inline">
+                                @if($comment->user && $comment->user->avatar)
+                                    <img src="{{ asset('storage/' . $comment->user->avatar) }}" alt="{{ $comment->user->name }}">
+                                @else
+                                    <div class="comment-avatar-placeholder-inline">
+                                        {{ strtoupper(substr($comment->user->name ?? 'U', 0, 1)) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="comment-content-inline">
+                                <div class="comment-bubble">
+                                    <a href="{{ route('profile.public', $comment->user_id) }}" class="comment-author-inline">
+                                        {{ $comment->user->name ?? 'Utilisateur' }}
+                                    </a>
+                                    <p class="comment-text-inline">{{ $comment->content }}</p>
+                                </div>
+                                <div class="comment-actions-inline">
+                                    <button class="comment-action-btn" onclick="likeComment({{ $comment->id }})">
+                                        <i class="far fa-heart"></i> J'aime
+                                    </button>
+                                    <span class="comment-time-inline">{{ $comment->created_at->diffForHumans() }}</span>
+                                    @auth
+                                        @if(Auth::id() === $comment->user_id)
+                                        <button class="comment-action-btn" onclick="deleteComment({{ $comment->id }}, {{ $ad->id }})">
+                                            <i class="fas fa-trash-alt"></i> Supprimer
+                                        </button>
+                                        @endif
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="no-comments-inline" id="no-comments-{{ $ad->id }}">
+                            <i class="far fa-comment-dots"></i>
+                            Aucun commentaire. Soyez le premier !
+                        </div>
+                        @endforelse
+                    </div>
+                    
+                    <!-- Formulaire de commentaire -->
+                    @auth
+                    <form class="comments-form-inline" onsubmit="submitComment(event, {{ $ad->id }})">
+                        <div class="comment-avatar-inline">
+                            @if(Auth::user()->avatar)
+                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                            @else
+                                <div class="comment-avatar-placeholder-inline">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="comment-input-wrapper">
+                            <input type="text" 
+                                   class="comment-input-inline" 
+                                   id="comment-input-{{ $ad->id }}" 
+                                   placeholder="Écrire un commentaire..." 
+                                   maxlength="500"
+                                   autocomplete="off"
+                                   onkeypress="if(event.key === 'Enter') { submitComment(event, {{ $ad->id }}); }">
+                            <button type="submit" class="comment-submit-btn" id="comment-submit-{{ $ad->id }}">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    @else
+                    <div class="login-to-comment">
+                        <i class="fas fa-lock me-1"></i>
+                        <a href="{{ route('login') }}">Connectez-vous</a> pour commenter
+                    </div>
+                    @endauth
+                </div>
+            </div>
+            @empty
+            <div class="empty-state">
+                <i class="fas fa-briefcase"></i>
+                <h3>Aucune offre disponible</h3>
+                <p>Soyez le premier à publier une offre !</p>
+                <a href="{{ route('ads.create') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Publier une offre
+                </a>
+            </div>
+            @endforelse
+            </div>
+
+            @if($ads->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $ads->links() }}
+            </div>
+            @endif
+            </div>
+            
+            <!-- Colonne droite: Top Pros -->
+            <div class="feed-sidebar">
+                <div class="top-pros-card">
+                    <div class="top-pros-header">
+                        <h3><i class="fas fa-crown"></i> Top Pros</h3>
+                    </div>
+                    <div class="top-pros-list">
+                        @php
+                            // Récupérer les meilleurs pros ou créer des données fictives
+                            $topPros = isset($premiumPros) && $premiumPros->count() > 0 
+                                ? $premiumPros->take(5) 
+                                : collect([
+                                    (object)['id' => 1, 'name' => 'Marie Dupont', 'avatar' => null, 'bio' => 'Plombière expérimentée', 'rating' => 4.9, 'reviews_count' => 127],
+                                    (object)['id' => 2, 'name' => 'Jean Martin', 'avatar' => null, 'bio' => 'Électricien certifié', 'rating' => 4.8, 'reviews_count' => 89],
+                                    (object)['id' => 3, 'name' => 'Sophie Bernard', 'avatar' => null, 'bio' => 'Peintre décoratrice', 'rating' => 4.8, 'reviews_count' => 156],
+                                    (object)['id' => 4, 'name' => 'Pierre Lambert', 'avatar' => null, 'bio' => 'Jardinier paysagiste', 'rating' => 4.7, 'reviews_count' => 73],
+                                    (object)['id' => 5, 'name' => 'Claire Moreau', 'avatar' => null, 'bio' => 'Aide-ménagère', 'rating' => 4.7, 'reviews_count' => 201],
+                                ]);
+                        @endphp
+                        
+                        @foreach($topPros as $index => $pro)
+                        <a href="{{ isset($pro->id) && $pro->id > 5 ? route('profile.public', $pro->id) : '#' }}" class="top-pro-item">
+                            <span class="top-pro-rank {{ $index === 0 ? 'gold' : ($index === 1 ? 'silver' : ($index === 2 ? 'bronze' : 'normal')) }}">
+                                {{ $index + 1 }}
+                            </span>
+                            <div class="top-pro-avatar">
+                                @if(isset($pro->avatar) && $pro->avatar)
+                                    <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}">
+                                @else
+                                    <div class="top-pro-avatar-placeholder">
+                                        {{ strtoupper(substr($pro->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="top-pro-info">
+                                <div class="top-pro-name">{{ $pro->name }}</div>
+                                <div class="top-pro-category">{{ $pro->bio ?? 'Professionnel' }}</div>
+                            </div>
+                            <div class="top-pro-rating">
+                                <i class="fas fa-star star"></i>
+                                <span>{{ number_format($pro->rating ?? $pro->reviews_avg_rating ?? (4.5 + (rand(0, 4) / 10)), 1, ',', '') }}</span>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                    <div class="top-pros-footer">
+                        <a href="{{ route('feed.professionals') }}">Voir tous les pros <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER - Mentions légales -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="row">
+            <!-- À propos -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-icon">M</span>
+                        <span class="logo-text">ProxiPro</span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de mise en relation entre particuliers et professionnels. 
+                        Trouvez des prestataires qualifiés ou proposez vos services.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liens utiles -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5 class="footer-title">Liens utiles</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ route('feed') }}">Accueil</a></li>
+                    <li><a href="{{ route('ads.create') }}">Publier une annonce</a></li>
+                    <li><a href="{{ route('pricing.index') }}">Tarifs</a></li>
+                    <li><a href="{{ route('contact.index') }}">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Informations légales -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="footer-title">Informations légales</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ route('legal.terms') }}">Conditions d'utilisation</a></li>
+                    <li><a href="{{ route('legal.privacy') }}">Politique de confidentialité</a></li>
+                    <li><a href="{{ route('legal.cookies') }}">Politique des cookies</a></li>
+                    <li><a href="{{ route('legal.mentions') }}">Mentions légales</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="footer-title">Contact</h5>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-envelope"></i> contact@ProxiPro.com</li>
+                    <li><i class="fas fa-phone"></i> +262 693 00 00 00</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Mayotte, France</li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="footer-divider">
+        
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="copyright">© {{ date('Y') }} ProxiPro. Tous droits réservés.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="footer-credits">Fait avec <i class="fas fa-heart text-danger"></i> à Mayotte</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+/* =========================================
+   FOOTER - Style moderne
+   ========================================= */
+.site-footer {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #94a3b8;
+    padding: 60px 0 0;
+    margin-top: 60px;
+}
+
+.footer-brand {
+    margin-bottom: 20px;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.footer-logo .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #3a86ff, #8338ec);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.footer-logo .logo-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+}
+
+.footer-description {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+}
+
+.social-link {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: #3a86ff;
+    color: white;
+    transform: translateY(-3px);
+}
+
+.footer-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    height: 2px;
+    background: #3a86ff;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.footer-links a:hover {
+    color: white;
+    padding-left: 5px;
+}
+
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-contact li {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-contact i {
+    color: #3a86ff;
+    width: 16px;
+}
+
+.footer-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 30px 0 20px;
+}
+
+.footer-bottom {
+    padding-bottom: 30px;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.footer-credits {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 40px 0 0;
+        text-align: center;
+    }
+    
+    .footer-logo {
+        justify-content: center;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+    
+    .footer-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-bottom .row > div {
+        text-align: center !important;
+    }
+}
+</style>
+
+<!-- LIGHTBOX POUR PHOTOS -->
+<div id="photoLightbox" class="photo-lightbox" onclick="closePhotoLightbox(event)">
+    <button class="photo-lightbox-close" onclick="closePhotoLightbox(event)">
+        <i class="fas fa-times"></i>
+    </button>
+    <img id="lightboxImage" src="" alt="Photo">
+    <div id="lightboxTitle" class="photo-lightbox-title"></div>
+</div>
+
+@endsection
+
+@push('scripts')
+<script>
+    console.log('=== Script ProxiPro Feed chargé ===');
+    
+    // =========================================
+    // SYSTÈME DE PUBLICATION SOCIALE AMÉLIORÉ
+    // =========================================
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const likedAds = new Set();
+
+    // =========================================
+    // GESTION DU LIGHTBOX PHOTO
+    // =========================================
+    function openPhotoLightbox(photoUrl, title) {
+        const lightbox = document.getElementById('photoLightbox');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        
+        if (lightbox && lightboxImage) {
+            lightboxImage.src = photoUrl;
+            lightboxTitle.textContent = title || '';
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closePhotoLightbox(event) {
+        // Ne pas fermer si on clique sur l'image elle-même
+        if (event && event.target && event.target.tagName === 'IMG') {
+            return;
+        }
+        
+        const lightbox = document.getElementById('photoLightbox');
+        if (lightbox) {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Fermer avec la touche Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePhotoLightbox({});
+        }
+    });
+
+    // =========================================
+    // GESTION DES LIKES
+    // =========================================
+    function toggleLike(adId) {
+        console.log('toggleLike appelé pour:', adId);
+        const btn = document.getElementById(`like-btn-${adId}`);
+        if (!btn) {
+            console.error('Bouton like non trouvé pour:', adId);
+            return;
+        }
+        
+        const likesCountEl = document.getElementById(`likes-count-${adId}`);
+        
+        const isLiked = likedAds.has(adId);
+        
+        if (isLiked) {
+            likedAds.delete(adId);
+            btn.classList.remove('liked');
+            btn.innerHTML = '<i class="far fa-heart"></i><span>J\'aime</span>';
+        } else {
+            likedAds.add(adId);
+            btn.classList.add('liked');
+            btn.innerHTML = '<i class="fas fa-heart"></i><span>J\'aime</span>';
+            
+            // Animation du cœur
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.style.animation = 'none';
+                setTimeout(() => icon.style.animation = '', 10);
+            }
+        }
+        
+        // Afficher/masquer le compteur (si l'élément existe)
+        if (likesCountEl) {
+            const likesNumber = likesCountEl.querySelector('.likes-number');
+            if (likesNumber) {
+                const currentCount = parseInt(likesNumber.textContent) || 0;
+                const newCount = isLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+                likesNumber.textContent = newCount;
+                likesCountEl.style.display = newCount > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        // Appel AJAX pour sauvegarder le like
+        fetch(`/ads/${adId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        }).catch(err => console.error('Erreur like:', err));
+    }
+    
+    function saveAd(adId) {
+        // Appel AJAX pour sauvegarder
+        fetch(`/saved-ads/${adId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            showToast('Annonce sauvegardée !', 'success');
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Annonce sauvegardée !', 'success');
+        });
+    }
+
+    // =========================================
+    // GESTION DU PARTAGE
+    // =========================================
+    function toggleShareMenu(adId, btn) {
+        console.log('toggleShareMenu appelé pour:', adId);
+        event.stopPropagation();
+        const menu = document.getElementById(`share-menu-${adId}`);
+        console.log('Menu trouvé:', menu);
+        if (!menu) {
+            console.error('Menu non trouvé:', `share-menu-${adId}`);
+            return;
+        }
+        const isOpen = menu.classList.contains('open');
+        console.log('Menu est ouvert:', isOpen);
+        
+        // Fermer tous les menus
+        document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
+        
+        if (!isOpen) {
+            menu.classList.add('open');
+            console.log('Menu maintenant ouvert');
+        }
+    }
+    
+    // Fermer le menu de partage en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.share-wrapper')) {
+            document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
+        }
+    });
+
+    function copyLink(adId) {
+        const url = `${window.location.origin}/ads/${adId}`;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(() => {
+                showShareFeedback(adId, 'copy');
+                showToast('Lien copié dans le presse-papiers !', 'success');
+                incrementShareCount(adId);
+            });
+        } else {
+            fallbackCopyToClipboard(url);
+            incrementShareCount(adId);
+        }
+        
+        document.getElementById(`share-menu-${adId}`).classList.remove('open');
+    }
+
+    function fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast('Lien copié dans le presse-papiers !', 'success');
+        } catch (err) {
+            showToast('Impossible de copier le lien', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function shareTo(platform, adId, title = '') {
+        const url = `${window.location.origin}/ads/${adId}`;
+        const shareTitle = title || 'Découvrez cette offre sur ProxiPro';
+        let shareUrl = '';
+        
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareTitle)}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodeURIComponent(shareTitle + ' ' + url)}`;
+                break;
+        }
+        
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+            showToast(`Partagé sur ${platform.charAt(0).toUpperCase() + platform.slice(1)} !`, 'success');
+            incrementShareCount(adId);
+        }
+        
+        // Fermer le menu
+        document.getElementById(`share-menu-${adId}`).classList.remove('open');
+    }
+    
+    // Incrémenter le compteur de partages
+    function incrementShareCount(adId) {
+        fetch(`/api/ads/${adId}/share`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mettre à jour le compteur dans l'interface
+                const shareCountEl = document.querySelector(`.shares-count-${adId}`);
+                if (shareCountEl) {
+                    shareCountEl.textContent = data.shares_count;
+                }
+            }
+        })
+        .catch(error => console.log('Erreur partage:', error));
+    }
+
+    function showShareFeedback(adId, type) {
+        const menu = document.getElementById(`share-menu-${adId}`);
+        const option = menu.querySelector(`.share-option.${type}`);
+        if (option) {
+            option.classList.add('copied');
+            const originalText = option.querySelector('span').textContent;
+            option.querySelector('span').textContent = 'Copié !';
+            setTimeout(() => {
+                option.classList.remove('copied');
+                option.querySelector('span').textContent = originalText;
+            }, 1500);
+        }
+    }
+
+    // =========================================
+    // GESTION DES COMMENTAIRES
+    // =========================================
+    const loadedComments = new Set(); // Pour éviter de recharger les commentaires déjà chargés
+    
+    function toggleComments(adId) {
+        if (event) event.stopPropagation();
+        
+        const section = document.getElementById(`comments-section-${adId}`);
+        const btn = document.getElementById(`comment-btn-${adId}`);
+        
+        if (!section) {
+            console.error('Section non trouvée:', `comments-section-${adId}`);
+            return;
+        }
+        
+        if (section.classList.contains('open')) {
+            section.classList.remove('open');
+            if (btn) btn.classList.remove('active-comments');
+        } else {
+            // Fermer les autres sections
+            document.querySelectorAll('.comments-section-inline.open').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.mission-action-btn.active-comments').forEach(b => b.classList.remove('active-comments'));
+            
+            section.classList.add('open');
+            if (btn) btn.classList.add('active-comments');
+            
+            // Charger les commentaires si pas déjà fait
+            if (!loadedComments.has(adId)) {
+                loadComments(adId);
+            }
+            
+            // Focus sur l'input
+            setTimeout(() => {
+                const input = document.getElementById(`comment-input-${adId}`);
+                if (input) input.focus();
+            }, 100);
+        }
+    }
+    
+    async function loadComments(adId) {
+        const commentsList = document.getElementById(`comments-list-${adId}`);
+        if (!commentsList) return;
+        
+        try {
+            const response = await fetch(`/ads/${adId}/comments`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) return;
+            
+            const data = await response.json();
+            
+            // Mettre à jour le compteur avec le nombre total de commentaires
+            if (data.total !== undefined) {
+                const countElements = document.querySelectorAll(`.comments-count-${adId}`);
+                countElements.forEach(el => {
+                    el.textContent = data.total;
+                });
+            }
+            
+            if (data.success && data.comments && data.comments.length > 0) {
+                // Masquer le message "aucun commentaire"
+                const noComments = document.getElementById(`no-comments-${adId}`);
+                if (noComments) noComments.style.display = 'none';
+                
+                // Afficher les commentaires
+                let html = '';
+                data.comments.forEach(comment => {
+                    const avatarHtml = comment.user.avatar 
+                        ? `<img src="${comment.user.avatar}" alt="${comment.user.name}">`
+                        : `<div class="comment-avatar-placeholder-inline">${comment.user.initial}</div>`;
+                    
+                    const deleteBtn = comment.user.id == {{ Auth::id() ?? 'null' }} 
+                        ? `<button class="comment-action-btn" onclick="deleteComment(${comment.id}, ${adId})"><i class="fas fa-trash-alt"></i> Supprimer</button>`
+                        : '';
+                    
+                    html += `
+                        <div class="comment-item-inline" data-comment-id="${comment.id}">
+                            <div class="comment-avatar-inline">${avatarHtml}</div>
+                            <div class="comment-content-inline">
+                                <div class="comment-bubble">
+                                    <a href="/profile/${comment.user.id}" class="comment-author-inline">${comment.user.name}</a>
+                                    <p class="comment-text-inline">${escapeHtml(comment.content)}</p>
+                                </div>
+                                <div class="comment-actions-inline">
+                                    <button class="comment-action-btn" onclick="likeComment(${comment.id})">
+                                        <i class="far fa-heart"></i> J'aime
+                                    </button>
+                                    <span class="comment-time-inline">${comment.created_at}</span>
+                                    ${deleteBtn}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                commentsList.innerHTML = html;
+                loadedComments.add(adId);
+            }
+        } catch (error) {
+            console.error('Erreur chargement commentaires:', error);
+        }
+    }
+
+    async function submitComment(event, adId) {
+        event.preventDefault();
+        
+        const input = document.getElementById(`comment-input-${adId}`);
+        const submitBtn = document.getElementById(`comment-submit-${adId}`);
+        const content = input.value.trim();
+        
+        if (!content) return;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            const response = await fetch(`/ads/${adId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ content: content })
+            });
+            
+            // Vérifier si la réponse est OK
+            if (!response.ok) {
+                if (response.status === 401) {
+                    showToast('Vous devez être connecté pour commenter', 'error');
+                    return;
+                }
+                if (response.status === 419) {
+                    showToast('Session expirée, veuillez rafraîchir la page', 'error');
+                    return;
+                }
+                const errorText = await response.text();
+                console.error('Erreur serveur:', response.status, errorText);
+                showToast('Erreur lors de l\'ajout du commentaire', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const noComments = document.getElementById(`no-comments-${adId}`);
+                if (noComments) noComments.style.display = 'none';
+                
+                const commentsList = document.getElementById(`comments-list-${adId}`);
+                const comment = data.comment;
+                
+                const avatarHtml = comment.user.avatar 
+                    ? `<img src="${comment.user.avatar}" alt="${comment.user.name}">`
+                    : `<div class="comment-avatar-placeholder-inline">${comment.user.initial}</div>`;
+                
+                const commentHtml = `
+                    <div class="comment-item-inline new-comment" data-comment-id="${comment.id}">
+                        <div class="comment-avatar-inline">${avatarHtml}</div>
+                        <div class="comment-content-inline">
+                            <div class="comment-bubble">
+                                <a href="/profile/${comment.user.id}" class="comment-author-inline">${comment.user.name}</a>
+                                <p class="comment-text-inline">${escapeHtml(comment.content)}</p>
+                            </div>
+                            <div class="comment-actions-inline">
+                                <button class="comment-action-btn" onclick="likeComment(${comment.id})">
+                                    <i class="far fa-heart"></i> J'aime
+                                </button>
+                                <span class="comment-time-inline">À l'instant</span>
+                                <button class="comment-action-btn" onclick="deleteComment(${comment.id}, ${adId})">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                commentsList.insertAdjacentHTML('afterbegin', commentHtml);
+                updateCommentCount(adId, 1);
+                input.value = '';
+                
+                showToast('Commentaire ajouté !', 'success');
+            } else {
+                showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showToast('Une erreur est survenue', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        }
+    }
+
+    async function deleteComment(commentId, adId) {
+        if (!confirm('Supprimer ce commentaire ?')) return;
+        
+        try {
+            const response = await fetch(`/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Erreur serveur:', response.status, errorText);
+                showToast('Erreur lors de la suppression', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const commentEl = document.querySelector(`.comment-item-inline[data-comment-id="${commentId}"]`);
+                if (commentEl) {
+                    commentEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    commentEl.style.opacity = '0';
+                    commentEl.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        commentEl.remove();
+                        updateCommentCount(adId, -1);
+                        
+                        const commentsList = document.getElementById(`comments-list-${adId}`);
+                        if (commentsList && commentsList.querySelectorAll('.comment-item-inline').length === 0) {
+                            commentsList.innerHTML = `
+                                <div class="no-comments-inline" id="no-comments-${adId}">
+                                    <i class="far fa-comment-dots"></i>
+                                    Aucun commentaire. Soyez le premier à commenter !
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                }
+                
+                showToast('Commentaire supprimé', 'success');
+            } else {
+                showToast(data.message || 'Erreur lors de la suppression', 'error');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showToast('Erreur lors de la suppression', 'error');
+        }
+    }
+
+    function likeComment(commentId) {
+        const btn = event.target.closest('.comment-action-btn');
+        btn.classList.toggle('liked');
+        
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('liked')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btn.style.color = '#dc2626';
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btn.style.color = '';
+        }
+        
+        // Appel AJAX
+        fetch(`/comments/${commentId}/like`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        }).catch(err => console.error('Erreur like commentaire:', err));
+    }
+
+    function updateCommentCount(adId, delta) {
+        const countElements = document.querySelectorAll(`.comments-count-${adId}`);
+        countElements.forEach(el => {
+            const current = parseInt(el.textContent) || 0;
+            el.textContent = Math.max(0, current + delta);
+        });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // =========================================
+    // SYSTÈME DE TOAST NOTIFICATIONS AMÉLIORÉ
+    // =========================================
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer') || createToastContainer();
+        const toastId = 'toast-' + Date.now();
+        
+        const icons = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            info: 'info-circle'
+        };
+        
+        const titles = {
+            success: 'Succès',
+            error: 'Erreur',
+            info: 'Information'
+        };
+        
+        const toastHtml = `
+            <div id="${toastId}" class="toast-custom ${type}">
+                <div class="toast-icon">
+                    <i class="fas fa-${icons[type]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.closest('.toast-custom').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        const toast = document.getElementById(toastId);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+    
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    // Fonction pour signaler une publication
+    function submitReport(adId, reason) {
+        fetch('/ads/' + adId + '/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ reason: reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Fermer le modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('reportModal' + adId));
+            if (modal) modal.hide();
+            
+            // Afficher un message de confirmation
+            alert('Merci pour votre signalement. Notre équipe va examiner cette publication.');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue. Veuillez réessayer.');
+        });
+    }
+
+    // État actuel des filtres
+    let currentFilters = {
+        mode: 'missions', // 'missions' ou 'providers'
+        category: '',
+        subcategory: '',
+        sort: 'recommended',
+        country: '',
+        city: '',
+        priceMin: null,
+        priceMax: null
+    };
+
+    // Données des catégories
+    const categoriesData = @json($missionCategories);
+
+    /**
+     * Toggle dropdown menu
+     */
+    function toggleDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        const isOpen = dropdown.classList.contains('open');
+        
+        // Fermer tous les autres dropdowns
+        document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+        
+        if (!isOpen) {
+            dropdown.classList.add('open');
+        }
+    }
+
+    // Fermer dropdowns en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter-dropdown')) {
+            document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+        }
+    });
+
+    /**
+     * Changer le mode de vue (prestataires / missions)
+     */
+    function setViewMode(mode) {
+        currentFilters.mode = mode;
+        
+        // Mettre à jour les boutons toggle
+        document.getElementById('togglePro').classList.toggle('active', mode === 'providers');
+        document.getElementById('toggleMission').classList.toggle('active', mode === 'missions');
+        
+        // Afficher/Masquer les sections
+        document.getElementById('providersSection').style.display = mode === 'providers' ? 'block' : 'none';
+        document.getElementById('missionsSection').style.display = mode === 'missions' ? 'block' : 'none';
+        
+        // Recharger les données
+        loadData();
+    }
+
+    /**
+     * Sélectionner une catégorie
+     */
+    function selectCategory(category) {
+        currentFilters.category = category;
+        currentFilters.subcategory = '';
+        
+        // Mettre à jour le label
+        const label = document.getElementById('categoryLabel');
+        label.textContent = category || 'Catégorie';
+        
+        // Mettre à jour les items sélectionnés
+        document.querySelectorAll('#categoryMenu .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === category);
+        });
+        
+        // Afficher le dropdown des sous-catégories si une catégorie est sélectionnée
+        const subcatDropdown = document.getElementById('subcategoryDropdown');
+        if (category && categoriesData[category] && categoriesData[category].subs) {
+            subcatDropdown.style.display = 'block';
+            populateSubcategories(categoriesData[category].subs);
+        } else {
+            subcatDropdown.style.display = 'none';
+        }
+        
+        // Fermer le dropdown
+        document.getElementById('categoryDropdown').classList.remove('open');
+        
+        // Recharger les données
+        loadData();
+    }
+
+    /**
+     * Remplir les sous-catégories
+     */
+    function populateSubcategories(subs) {
+        const menu = document.getElementById('subcategoryMenu');
+        let html = '<div class="filter-menu-item selected" data-value="" onclick="selectSubcategory(\'\')"><i class="fas fa-check"></i> Toutes</div>';
+        
+        subs.forEach(sub => {
+            html += `<div class="filter-menu-item" data-value="${sub.name}" onclick="selectSubcategory('${sub.name}')">
+                <i class="${sub.icon || 'fas fa-tag'}"></i> ${sub.name}
+                <span class="ms-auto text-muted small">${sub.count || 0}</span>
+            </div>`;
+        });
+        
+        menu.innerHTML = html;
+        document.getElementById('subcategoryLabel').textContent = 'Sous-catégorie';
+    }
+
+    /**
+     * Sélectionner une sous-catégorie
+     */
+    function selectSubcategory(subcategory) {
+        currentFilters.subcategory = subcategory;
+        
+        document.getElementById('subcategoryLabel').textContent = subcategory || 'Sous-catégorie';
+        
+        document.querySelectorAll('#subcategoryMenu .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === subcategory);
+        });
+        
+        document.getElementById('subcategoryDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Sélectionner le tri
+     */
+    function selectSort(sort) {
+        currentFilters.sort = sort;
+        
+        const labels = {
+            'recommended': 'Recommandé',
+            'recent': 'Plus récent',
+            'urgent': 'Urgent'
+        };
+        
+        document.getElementById('sortLabel').textContent = labels[sort] || 'Trier';
+        
+        document.querySelectorAll('#sortDropdown .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === sort);
+        });
+        
+        document.getElementById('sortDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Définir la tranche de prix
+     */
+    function setPriceRange(min, max) {
+        document.getElementById('priceMin').value = min || '';
+        document.getElementById('priceMax').value = max || '';
+    }
+
+    /**
+     * Réinitialiser le filtre de prix
+     */
+    function resetPriceFilter() {
+        document.getElementById('priceMin').value = '';
+        document.getElementById('priceMax').value = '';
+        currentFilters.priceMin = null;
+        currentFilters.priceMax = null;
+        document.getElementById('priceLabel').textContent = 'Prix';
+        document.getElementById('priceDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Appliquer le filtre de prix
+     */
+    function applyPriceFilter() {
+        currentFilters.priceMin = document.getElementById('priceMin').value || null;
+        currentFilters.priceMax = document.getElementById('priceMax').value || null;
+        
+        let label = 'Prix';
+        if (currentFilters.priceMin && currentFilters.priceMax) {
+            label = `${currentFilters.priceMin}€ - ${currentFilters.priceMax}€`;
+        } else if (currentFilters.priceMin) {
+            label = `${currentFilters.priceMin}€+`;
+        } else if (currentFilters.priceMax) {
+            label = `0 - ${currentFilters.priceMax}€`;
+        }
+        
+        document.getElementById('priceLabel').textContent = label;
+        document.getElementById('priceDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Suggestions villes / codes postaux selon le pays sélectionné
+     */
+    function getSelectedCountryCode() {
+        const select = document.getElementById('countrySelect');
+        if (!select) return '';
+        const option = select.options[select.selectedIndex];
+        return option?.dataset?.code || '';
+    }
+
+    function resetCitySuggestions() {
+        const list = document.getElementById('citySuggestions');
+        if (list) list.innerHTML = '';
+    }
+
+    function buildLocationLabel(item) {
+        const address = item.address || {};
+        const city = address.city || address.town || address.village || address.municipality || address.county || '';
+        const postcode = address.postcode || '';
+        if (city && postcode) return `${city} ${postcode}`;
+        if (city) return city;
+        if (postcode) return postcode;
+        return item.display_name || '';
+    }
+
+    const debouncedCitySearch = (() => {
+        let timeoutId;
+        return (query) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fetchCitySuggestions(query), 350);
+        };
+    })();
+
+    function fetchCitySuggestions(query) {
+        const code = getSelectedCountryCode();
+        const list = document.getElementById('citySuggestions');
+        if (!list) return;
+
+        if (!code || !query || query.length < 2) {
+            list.innerHTML = '';
+            return;
+        }
+
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=10&countrycodes=${code}&q=${encodeURIComponent(query)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(results => {
+                const labels = new Set();
+                results.forEach(item => {
+                    const label = buildLocationLabel(item);
+                    if (label) labels.add(label);
+                });
+
+                list.innerHTML = Array.from(labels)
+                    .map(label => `<option value="${label}"></option>`)
+                    .join('');
+            })
+            .catch(() => {
+                list.innerHTML = '';
+            });
+    }
+
+    // ===== CITIES DATA BY COUNTRY FOR FILTER =====
+    const filterCitiesByCountry = {
+        "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier", "Bordeaux", "Lille", "Rennes", "Reims", "Le Havre", "Saint-Étienne", "Toulon", "Grenoble", "Dijon", "Angers", "Nîmes", "Villeurbanne", "Clermont-Ferrand", "Le Mans", "Aix-en-Provence", "Brest", "Tours", "Amiens", "Limoges", "Perpignan", "Metz", "Besançon", "Orléans", "Rouen", "Mulhouse", "Caen", "Nancy"],
+        "Mayotte": ["Mamoudzou", "Koungou", "Dzaoudzi", "Dembeni", "Bandraboua", "Tsingoni", "Sada", "Ouangani", "Chiconi", "Pamandzi", "Mtsamboro", "Acoua", "Chirongui", "Bouéni", "Kani-Kéli", "Bandrélé", "M'Tsangamouji"],
+        "Comores": ["Moroni", "Mutsamudu", "Fomboni", "Domoni", "Mitsoudjé", "Ouani", "Iconi", "Mitsamiouli", "Mbéni", "Sima"],
+        "Madagascar": ["Antananarivo", "Toamasina", "Antsirabe", "Fianarantsoa", "Mahajanga", "Toliara", "Antsiranana", "Ambatondrazaka", "Antalaha", "Nosy Be", "Sainte-Marie", "Morondava", "Ambositra", "Mananjary", "Sambava"],
+        "La Réunion": ["Saint-Denis", "Saint-Paul", "Saint-Pierre", "Le Tampon", "Saint-André", "Saint-Louis", "Saint-Benoît", "Le Port", "Saint-Joseph", "Sainte-Marie", "Sainte-Suzanne", "Saint-Leu", "La Possession", "Bras-Panon", "Cilaos", "Salazie"],
+        "Maurice": ["Port-Louis", "Beau Bassin-Rose Hill", "Vacoas-Phoenix", "Curepipe", "Quatre Bornes", "Triolet", "Goodlands", "Centre de Flacq", "Mahébourg", "Grand Baie", "Flic en Flac", "Tamarin"],
+        "Belgique": ["Bruxelles", "Anvers", "Gand", "Charleroi", "Liège", "Bruges", "Namur", "Louvain", "Mons", "Alost", "Malines", "La Louvière", "Courtrai", "Ostende", "Hasselt", "Tournai", "Genk", "Seraing", "Verviers", "Mouscron"],
+        "Suisse": ["Zurich", "Genève", "Bâle", "Lausanne", "Berne", "Winterthour", "Lucerne", "Saint-Gall", "Lugano", "Bienne", "Thoune", "Köniz", "Fribourg", "Schaffhouse", "Neuchâtel", "Sion"],
+        "Canada": ["Toronto", "Montréal", "Vancouver", "Calgary", "Edmonton", "Ottawa", "Winnipeg", "Québec", "Hamilton", "Kitchener", "London", "Victoria", "Halifax", "Oshawa", "Windsor", "Saskatoon", "Regina", "Sherbrooke", "Laval", "Gatineau"],
+        "Sénégal": ["Dakar", "Thiès", "Rufisque", "Kaolack", "M'Bour", "Saint-Louis", "Ziguinchor", "Diourbel", "Louga", "Tambacounda", "Kolda", "Richard-Toll", "Tivaouane", "Touba", "Kédougou"],
+        "Côte d'Ivoire": ["Abidjan", "Bouaké", "Yamoussoukro", "Korhogo", "San-Pédro", "Man", "Divo", "Daloa", "Gagnoa", "Abengourou", "Anyama", "Agboville", "Dabou", "Grand-Bassam", "Bingerville"],
+        "Maroc": ["Casablanca", "Rabat", "Fès", "Marrakech", "Tanger", "Agadir", "Meknès", "Oujda", "Kénitra", "Tétouan", "Safi", "El Jadida", "Nador", "Béni Mellal", "Essaouira", "Ouarzazate"],
+        "Tunisie": ["Tunis", "Sfax", "Sousse", "Kairouan", "Bizerte", "Gabès", "Ariana", "Gafsa", "El Mourouj", "Kasserine", "Monastir", "La Marsa", "Hammamet", "Djerba", "Tozeur"],
+        "Algérie": ["Alger", "Oran", "Constantine", "Annaba", "Blida", "Batna", "Sétif", "Djelfa", "Sidi Bel Abbès", "Biskra", "Tébessa", "Skikda", "Tiaret", "Béjaïa", "Tlemcen", "Ouargla"],
+        "Guadeloupe": ["Pointe-à-Pitre", "Les Abymes", "Baie-Mahault", "Le Gosier", "Petit-Bourg", "Sainte-Anne", "Le Moule", "Sainte-Rose", "Capesterre-Belle-Eau", "Basse-Terre"],
+        "Martinique": ["Fort-de-France", "Le Lamentin", "Le Robert", "Schoelcher", "Sainte-Marie", "Le François", "Ducos", "Saint-Joseph", "La Trinité", "Rivière-Pilote"],
+        "Guyane": ["Cayenne", "Saint-Laurent-du-Maroni", "Kourou", "Matoury", "Rémire-Montjoly", "Macouria", "Mana", "Maripasoula", "Apatou", "Iracoubo"]
+    };
+
+    function updateFilterCities() {
+        const countrySelect = document.getElementById('countrySelect');
+        const citySelect = document.getElementById('citySelect');
+        const customCityWrapper = document.getElementById('customCityWrapper');
+        const cityInput = document.getElementById('cityInput');
+        const country = countrySelect.value;
+        
+        citySelect.innerHTML = '<option value="">-- Sélectionner une ville --</option>';
+        customCityWrapper.style.display = 'none';
+        if (cityInput) cityInput.value = '';
+        
+        if (country && filterCitiesByCountry[country]) {
+            citySelect.disabled = false;
+            filterCitiesByCountry[country].forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+            // Add "Autre" option for manual input
+            const otherOption = document.createElement('option');
+            otherOption.value = "__other__";
+            otherOption.textContent = "🔤 Autre ville (saisir manuellement)";
+            citySelect.appendChild(otherOption);
+        } else {
+            citySelect.disabled = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const citySelect = document.getElementById('citySelect');
+        const customCityWrapper = document.getElementById('customCityWrapper');
+        const cityInput = document.getElementById('cityInput');
+
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                if (this.value === "__other__") {
+                    customCityWrapper.style.display = 'block';
+                    cityInput.focus();
+                } else {
+                    customCityWrapper.style.display = 'none';
+                    if (cityInput) cityInput.value = '';
+                }
+            });
+        }
+    });
+
+    /**
+     * Réinitialiser le filtre de localisation
+     */
+    function resetLocationFilter() {
+        document.getElementById('countrySelect').value = '';
+        document.getElementById('citySelect').innerHTML = '<option value="">-- Sélectionner une ville --</option>';
+        document.getElementById('citySelect').disabled = true;
+        document.getElementById('customCityWrapper').style.display = 'none';
+        document.getElementById('cityInput').value = '';
+        currentFilters.country = '';
+        currentFilters.city = '';
+        document.getElementById('locationLabel').textContent = 'Localisation';
+        document.getElementById('locationDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Appliquer le filtre de localisation
+     */
+    function applyLocationFilter() {
+        const countrySelect = document.getElementById('countrySelect');
+        const citySelect = document.getElementById('citySelect');
+        const cityInput = document.getElementById('cityInput');
+        
+        currentFilters.country = countrySelect ? countrySelect.value : '';
+        
+        // Si "Autre" est sélectionné, utiliser le champ de saisie manuelle
+        if (citySelect.value === "__other__") {
+            currentFilters.city = cityInput.value || '';
+        } else {
+            currentFilters.city = citySelect.value || '';
+        }
+        
+        let label = 'Localisation';
+        if (currentFilters.city) {
+            label = currentFilters.city;
+        } else if (currentFilters.country) {
+            label = currentFilters.country;
+        }
+        
+        document.getElementById('locationLabel').textContent = label;
+        document.getElementById('locationDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Charger les données avec les filtres
+     */
+    function loadData() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.classList.add('active');
+        
+        // Construire l'URL avec les filtres
+        let url = currentFilters.mode === 'providers' 
+            ? '{{ route("feed.professionals") }}' 
+            : '{{ route("feed.filter-ads") }}';
+        
+        const params = new URLSearchParams();
+        
+        if (currentFilters.category) params.append('category', currentFilters.category);
+        if (currentFilters.subcategory) params.append('subcategory', currentFilters.subcategory);
+        if (currentFilters.sort) params.append('sort', currentFilters.sort);
+        if (currentFilters.city) {
+            params.append('location', currentFilters.city);
+        } else if (currentFilters.country) {
+            params.append('location', currentFilters.country);
+        }
+        if (currentFilters.priceMin) params.append('price_min', currentFilters.priceMin);
+        if (currentFilters.priceMax) params.append('price_max', currentFilters.priceMax);
+        params.append('format', 'json');
+        
+        fetch(`${url}?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                overlay.classList.remove('active');
+                
+                if (currentFilters.mode === 'providers') {
+                    renderProviders(data.professionals || data);
+                } else {
+                    renderMissions(data.ads || data);
+                }
+            })
+            .catch(err => {
+                console.error('Erreur chargement:', err);
+                overlay.classList.remove('active');
+            });
+    }
+
+    /**
+     * Rendu des prestataires
+     */
+    function renderProviders(providers) {
+        const grid = document.getElementById('providersGrid');
+        
+        if (!providers || providers.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-users"></i>
+                    <h3>Aucun prestataire trouvé</h3>
+                    <p>Essayez d'autres critères de recherche</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        providers.forEach(pro => {
+            const avatar = pro.avatar 
+                ? `<img src="/storage/${pro.avatar}" alt="${pro.name}">`
+                : `<div class="provider-image-placeholder">${pro.name.charAt(0).toUpperCase()}</div>`;
+            
+            const badge = (pro.plan && pro.plan !== 'free') 
+                ? '<div class="provider-badge-top">💜 Top prestataire</div>' 
+                : '';
+            
+            const proBadge = pro.user_type === 'professionnel' 
+                ? '<span class="badge-pro">PRO</span>' 
+                : '';
+            
+            const price = pro.hourly_rate 
+                ? `<span class="provider-price">${pro.hourly_rate} €/h</span>` 
+                : '';
+            
+            html += `
+                <a href="/user/${pro.id}" class="provider-card">
+                    <div class="provider-image-wrapper">
+                        ${avatar}
+                        ${badge}
+                    </div>
+                    <div class="provider-card-info">
+                        <div class="provider-info-header">
+                            <h3 class="provider-name">${pro.name.substring(0, 18)} ${proBadge}</h3>
+                            ${price}
+                        </div>
+                        <div class="provider-rating">
+                            <span class="star-icon">★</span>
+                            <span class="rating-value">${(pro.rating || (Math.random() * 0.5 + 4.5)).toFixed(1).replace('.', ',')}</span>
+                            <span class="reviews-count">(${pro.reviews_count || Math.floor(Math.random() * 500 + 50)} avis)</span>
+                        </div>
+                        ${pro.bio ? `<p class="provider-category">${pro.bio.substring(0, 40)}</p>` : ''}
+                    </div>
+                </a>
+            `;
+        });
+        
+        grid.innerHTML = html;
+    }
+
+    /**
+     * Construire l'URL d'une photo
+     */
+    function buildPhotoUrl(photo) {
+        if (!photo) return '';
+        if (photo.startsWith('http://') || photo.startsWith('https://')) return photo;
+        if (photo.startsWith('/storage/')) return photo;
+        if (photo.startsWith('storage/')) return '/' + photo;
+        if (photo.startsWith('public/')) return '/storage/' + photo.replace('public/', '');
+        return '/storage/' + photo.replace(/^\/+/, '');
+    }
+
+    /**
+     * Rendu des missions
+     */
+    function renderMissions(missions) {
+        const grid = document.getElementById('missionsGrid');
+        
+        if (!missions || missions.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Aucune mission trouvée</h3>
+                    <p>Essayez d'autres critères de recherche</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        missions.forEach(ad => {
+            const userAvatar = ad.user && ad.user.avatar 
+                ? `<img src="/storage/${ad.user.avatar}" alt="${ad.user.name}">`
+                : `<div class="mission-user-avatar-placeholder">${(ad.user?.name || 'U').charAt(0).toUpperCase()}</div>`;
+            
+            let photos = [];
+            if (ad.photos) {
+                if (Array.isArray(ad.photos)) {
+                    photos = ad.photos;
+                } else if (typeof ad.photos === 'string') {
+                    try {
+                        photos = JSON.parse(ad.photos);
+                    } catch {
+                        photos = [ad.photos];
+                    }
+                }
+            }
+            
+            let photosHtml = '';
+            if (photos.length > 0) {
+                const photoClass = photos.length === 1 ? 'single-photo' : 'two-photos';
+                photosHtml = `<div class="mission-photos ${photoClass}">`;
+                photos.slice(0, 2).forEach((photo, index) => {
+                    const url = buildPhotoUrl(photo);
+                    const title = (ad.title || '').replace(/'/g, "\\'");
+                    const morePhotos = (index === 1 && photos.length > 2) ? `<div class="mission-photo-more">+${photos.length - 2}</div>` : '';
+                    photosHtml += `<div class="mission-photo" onclick="openPhotoLightbox('${url}', '${title}')" style="cursor: pointer;"><img src="${url}" alt="${ad.title}">${morePhotos}</div>`;
+                });
+                photosHtml += '</div>';
+            }
+            
+            const urgentBadge = ad.is_urgent 
+                ? '<span class="mission-badge mission-badge-urgent"><i class="fas fa-bolt me-1"></i>Urgent</span>' 
+                : '';
+            
+            html += `
+                <div class="mission-card" data-ad-id="${ad.id}">
+                    <!-- En-tête avec avatar et menu 3 points -->
+                    <div class="mission-card-header">
+                        <a href="/user/${ad.user_id}" class="mission-user-avatar">${userAvatar}</a>
+                        <div class="mission-user-info">
+                            <a href="/user/${ad.user_id}" class="mission-user-name text-decoration-none">${ad.user?.name || 'Utilisateur'}</a>
+                            <div class="mission-meta">
+                                <span>${ad.created_at_human || 'Récemment'}</span>
+                                <span>·</span>
+                                <span><i class="fas fa-map-marker-alt me-1"></i>${ad.location || 'France'}</span>
+                            </div>
+                        </div>
+                        <!-- Menu 3 points -->
+                        <div class="dropdown ms-auto">
+                            <button class="btn-three-dots" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li><a class="dropdown-item" href="/ads/${ad.id}"><i class="fas fa-eye me-2 text-primary"></i>Voir les détails</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="saveAd(${ad.id}); return false;"><i class="far fa-bookmark me-2 text-warning"></i>Sauvegarder</a></li>
+                                <li><a class="dropdown-item" href="/user/${ad.user_id}"><i class="fas fa-user me-2 text-info"></i>Voir le profil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="showReportModal(${ad.id}); return false;"><i class="fas fa-flag me-2"></i>Signaler la publication</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="hideAd(${ad.id}); return false;"><i class="fas fa-eye-slash me-2 text-muted"></i>Masquer cette annonce</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenu -->
+                    <div class="mission-card-body">
+                        <a href="/ads/${ad.id}" class="text-decoration-none">
+                            <h4 class="mission-title">${ad.title}</h4>
+                        </a>
+                        <p class="mission-description">${(ad.description || '').substring(0, 150)}...</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="mission-badges">
+                                <span class="mission-badge mission-badge-category">${ad.category}</span>
+                                ${urgentBadge}
+                            </div>
+                            <span class="mission-price">${ad.price ? new Intl.NumberFormat('fr-FR').format(ad.price) + ' €' : 'Sur devis'}</span>
+                        </div>
+                        
+                        ${photosHtml}
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="mission-stats">
+                        <div class="mission-stats-left">
+                            <span>
+                                <i class="fas fa-heart" style="color: #dc2626;"></i>
+                                <span class="likes-number">0</span>
+                            </span>
+                        </div>
+                        <div class="mission-stats-right"></div>
+                    </div>
+                    
+                    <!-- Boutons d'actions sociales - J'aime, Commenter, Partager -->
+                    <div class="mission-actions">
+                        <button class="mission-action-btn" id="like-btn-${ad.id}" onclick="toggleLike(${ad.id})">
+                            <i class="far fa-heart"></i>
+                            <span>J'aime</span>
+                        </button>
+                        <button class="mission-action-btn" id="comment-btn-${ad.id}" onclick="toggleComments(${ad.id})">
+                            <i class="far fa-comment"></i>
+                            <span><span class="comments-count-${ad.id}">${ad.comments_count || 0}</span> Commenter</span>
+                        </button>
+                        <div class="share-wrapper">
+                            <button class="mission-action-btn" onclick="toggleShareMenu(${ad.id}, this)">
+                                <i class="fas fa-share"></i>
+                                <span><span class="shares-count-${ad.id}">${ad.shares_count || 0}</span> Partager</span>
+                            </button>
+                            <!-- Menu de partage -->
+                            <div class="share-menu" id="share-menu-${ad.id}">
+                                <div class="share-menu-header">Partager</div>
+                                <div class="share-option copy" onclick="copyLink(${ad.id})">
+                                    <i class="fas fa-link"></i>
+                                    <span>Copier le lien</span>
+                                </div>
+                                <div class="share-option twitter" onclick="shareTo('twitter', ${ad.id}, '${(ad.title || '').replace(/'/g, "\\'")}')">
+                                    <i class="fab fa-twitter"></i>
+                                    <span>Twitter</span>
+                                </div>
+                                <div class="share-option facebook" onclick="shareTo('facebook', ${ad.id})">
+                                    <i class="fab fa-facebook-f"></i>
+                                    <span>Facebook</span>
+                                </div>
+                                <div class="share-option whatsapp" onclick="shareTo('whatsapp', ${ad.id}, '${(ad.title || '').replace(/'/g, "\\'")}')">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <span>WhatsApp</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Commentaires Inline -->
+                    <div class="comments-section-inline" id="comments-section-${ad.id}">
+                        <div class="comments-header">
+                            <h5><i class="far fa-comments"></i> Commentaires</h5>
+                            <button class="comments-close-btn" onclick="toggleComments(${ad.id})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Liste des commentaires -->
+                        <div class="comments-list-inline" id="comments-list-${ad.id}">
+                            <div class="no-comments-inline" id="no-comments-${ad.id}">
+                                <i class="far fa-comment-dots"></i>
+                                Aucun commentaire. Soyez le premier à commenter !
+                            </div>
+                        </div>
+                        
+                        <!-- Formulaire de commentaire -->
+                        <div class="comment-form-inline">
+                            <div class="comment-input-wrapper">
+                                <input type="text" class="comment-input-inline" id="comment-input-${ad.id}" placeholder="Écrivez un commentaire..." onkeypress="if(event.key === 'Enter') { submitComment(event, ${ad.id}); }">
+                                <button class="comment-submit-inline" id="comment-submit-${ad.id}" onclick="submitComment(event, ${ad.id})">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        grid.innerHTML = html;
+    }
+    
+    // Fonction pour afficher le modal de signalement
+    function showReportModal(adId) {
+        alert("Fonctionnalité de signalement pour l'annonce #" + adId + ". Cette fonctionnalité sera bientôt disponible.");
+    }
+    
+    // Fonction pour masquer une annonce
+    function hideAd(adId) {
+        const card = document.querySelector(`.mission-card[data-ad-id="${adId}"]`);
+        if (card) {
+            card.style.display = 'none';
+        }
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM chargé, initialisation des boutons...');
+        
+        // La vue par défaut est "missions"
+        setViewMode('missions');
+        
+        // Attacher les événements aux boutons d'action
+        document.querySelectorAll('.mission-action-btn').forEach(btn => {
+            console.log('Bouton trouvé:', btn);
+        });
+        
+        // Test: vérifier si les fonctions existent
+        console.log('toggleLike existe:', typeof toggleLike);
+        console.log('toggleComments existe:', typeof toggleComments);
+        console.log('toggleShareMenu existe:', typeof toggleShareMenu);
+    });
+</script>
+@endpush

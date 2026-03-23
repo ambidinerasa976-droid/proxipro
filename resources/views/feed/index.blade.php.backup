@@ -1,0 +1,5544 @@
+@extends('layouts.app')
+
+@section('title', 'Accueil - ProxiPro')
+
+@push('styles')
+<style>
+    /* =========================================
+       PAGE D'ACCUEIL FEED - STYLE MARKETPLACE PRO
+       ========================================= */
+    :root {
+        --primary: #4f46e5;
+        --primary-dark: #4338ca;
+        --primary-light: rgba(79, 70, 229, 0.08);
+        --secondary: #7c3aed;
+        --accent: #f59e0b;
+
+        --bg-body: #f8fafc;
+        --text-dark: #0f172a;
+        --text-light: #64748b;
+        --white: #ffffff;
+        --border: #e2e8f0;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================
+       HERO SECTION - Compact & Modern
+       ========================================= */
+    .hero-shape-1 {
+        position: absolute; top: 0; right: 0; width: 15rem; height: 15rem;
+        border-radius: 9999px; background-color: rgba(79, 70, 229, 0.35);
+        filter: blur(50px); transform: translate(5rem, -5rem);
+    }
+    .hero-shape-2 {
+        position: absolute; bottom: 0; left: 0; width: 12rem; height: 12rem;
+        border-radius: 9999px; background-color: rgba(124, 58, 237, 0.25);
+        filter: blur(40px); transform: translate(-3rem, 3rem);
+    }
+
+    .hero-greeting {
+        color: white;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    .hero-greeting h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .hero-greeting h1 span {
+        color: #a5b4fc;
+    }
+    .hero-subtitle {
+        color: #c7d2fe;
+        font-size: 0.85rem;
+        margin-top: 0.15rem;
+    }
+
+    /* Quick category shortcuts */
+    .category-shortcuts {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px 0;
+    }
+    .category-shortcuts-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .category-shortcuts-inner::-webkit-scrollbar { display: none; }
+    .cat-shortcut {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #475569;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+    .cat-shortcut:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .cat-shortcut i {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+
+    /* =========================================
+       BARRE DE FILTRES - Fixée au header
+       ========================================= */
+    .filter-bar-container {
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px 0;
+        position: fixed;
+        top: 90px; /* Juste en dessous du header */
+        left: 0;
+        right: 0;
+        z-index: 999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.98);
+    }
+
+    /* Spacer pour compenser la barre fixe */
+    .filter-bar-spacer {
+        height: 70px;
+    }
+
+    /* Hero section compacte repositionnée */
+    .hero-section-compact {
+        background: linear-gradient(160deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+        padding: 1.2rem 0 1.5rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Boutons dropdown de filtre */
+    .filter-dropdown {
+        position: relative;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .filter-btn:hover {
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+    }
+
+    .filter-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+    }
+
+    .filter-btn i {
+        font-size: 0.8rem;
+    }
+
+    .filter-btn .chevron {
+        margin-left: 4px;
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+    }
+
+    .filter-dropdown.open .filter-btn .chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Menu dropdown */
+    .filter-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 220px;
+        max-height: 320px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+    }
+
+    .filter-dropdown.open .filter-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .filter-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        font-size: 0.875rem;
+        color: #475569;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .filter-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .filter-menu-item:hover {
+        background: #f8fafc;
+    }
+
+    .filter-menu-item.selected {
+        background: #eff6ff;
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .filter-menu-item i {
+        width: 20px;
+        color: #94a3b8;
+    }
+
+    .filter-menu-item.selected i {
+        color: var(--primary);
+    }
+
+    /* Toggle Buttons - Je cherche un Pro / Je cherche une mission */
+    .toggle-group {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 25px;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .toggle-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+        color: #64748b;
+    }
+
+    .toggle-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    }
+
+    .toggle-btn:hover:not(.active) {
+        background: #e2e8f0;
+    }
+
+    /* Séparateur vertical */
+    .filter-separator {
+        width: 1px;
+        height: 28px;
+        background: #e2e8f0;
+        margin: 0 4px;
+    }
+
+    /* Bouton Publier une offre dans la barre de filtre */
+    .btn-publish-offer {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        margin-left: auto;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+        white-space: nowrap;
+    }
+
+    .btn-publish-offer:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #3730a3);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-publish-offer i {
+        font-size: 0.9rem;
+    }
+
+    /* =========================================
+       CONTENEUR PRINCIPAL
+       ========================================= */
+    .content-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 20px;
+        background: var(--bg-body);
+        min-height: calc(100vh - 200px);
+    }
+
+    /* Layout 2 colonnes: Sidebar (gauche collée) + Feed (centre page) */
+    .feed-layout {
+        position: relative;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Colonne principale: Feed des missions - centrée sur la page */
+    .feed-main {
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        left: 0;
+    }
+
+    /* Sidebar - collée au bord gauche, sticky au scroll */
+    .feed-sidebar-left {
+        position: fixed;
+        left: 80px;
+        top: 165px;
+        width: 240px;
+        padding-left: 0;
+        height: calc(100vh - 185px);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        z-index: 100;
+        transition: top 0.2s ease, height 0.2s ease;
+    }
+    .feed-sidebar-left::-webkit-scrollbar {
+        display: none;
+    }
+
+    .feed-sidebar {
+        display: none;
+    }
+
+    /* Écrans larges : plus d'espace pour la sidebar */
+    @media (min-width: 1600px) {
+        .feed-sidebar-left {
+            left: 88px;
+            width: 260px;
+        }
+    }
+
+    /* Tablette large : sidebar plus étroite, moins de marge */
+    @media (max-width: 1200px) {
+        .feed-sidebar-left {
+            width: 210px;
+            left: 60px;
+        }
+    }
+
+    /* Tablette : sidebar masquée, feed pleine largeur */
+    @media (max-width: 992px) {
+        .feed-layout {
+            padding: 0;
+        }
+        .feed-main {
+            max-width: 100%;
+        }
+        .feed-sidebar-left {
+            position: relative;
+            left: auto;
+            top: auto;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            max-height: none;
+            overflow-y: visible;
+            margin-bottom: 16px;
+        }
+        .feed-sidebar {
+            display: none;
+        }
+    }
+
+    /* Mobile : espacement réduit */
+    @media (max-width: 640px) {
+        .content-container {
+            padding: 16px 12px;
+        }
+        .feed-sidebar-left {
+            display: none;
+        }
+    }
+
+    /* ===== SIDEBAR DROITE - MENU UTILISATEUR ===== */
+    .sidebar-menu-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .sidebar-menu-card:hover {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar-menu-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-menu-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.85rem;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .sidebar-menu-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .sidebar-menu-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+
+    .sidebar-menu-sub {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 2px;
+    }
+    .sidebar-menu-links {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 12px;
+    }
+        .sidebar-menu-card {
+            transform: none; /* Reset transform for sidebar menu card */
+        }
+
+    .sidebar-menu-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        background: transparent;
+        border: none;
+        color: #1e293b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.15s ease;
+    }
+
+    .sidebar-menu-link i {
+        width: 18px;
+        text-align: center;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-menu-link:hover {
+        background: #f1f5f9;
+        color: var(--primary);
+    }
+    .sidebar-menu-link:hover i {
+        color: var(--primary);
+    }
+
+    .sidebar-menu-logout {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .sidebar-menu-logout button {
+        width: 100%;
+        border: none;
+        background: transparent;
+        color: #ef4444;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 9px 12px;
+        border-radius: 8px;
+        transition: all 0.15s ease;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sidebar-menu-logout button:hover {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .sidebar-left-widgets {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* Widgets cards dans la sidebar */
+    .sidebar-left-widgets > div {
+        border-radius: 14px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04) !important;
+        border-color: #e2e8f0 !important;
+        transition: box-shadow 0.2s ease;
+    }
+    .sidebar-left-widgets > div:hover {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+    }
+
+
+
+    /* Grille des cartes prestataires */
+    .providers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Carte prestataire - Style Marketplace */
+    .provider-card {
+        background: transparent;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .provider-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .provider-image-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .provider-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .provider-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .provider-badge-top {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        background: rgba(138, 43, 226, 0.85);
+        backdrop-filter: blur(4px);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .provider-card-info {
+        padding: 8px 2px;
+    }
+
+    .provider-info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .provider-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d3436;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+    }
+
+    .provider-price {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3436;
+    }
+
+    .badge-pro {
+        background: #0084ff;
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+
+    .provider-rating {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .star-icon {
+        color: #fdcb6e;
+        margin-right: 4px;
+        font-weight: bold;
+    }
+
+    .rating-value {
+        font-weight: 700;
+        color: #2d3436;
+    }
+
+    .reviews-count {
+        color: #636e72;
+        margin-left: 6px;
+    }
+
+    .provider-category {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    /* =========================================
+       URGENT ADS HORIZONTAL CAROUSEL
+       ========================================= */
+    .urgent-carousel-section {
+        margin-bottom: 20px;
+    }
+    .urgent-carousel-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 0 4px;
+    }
+    .urgent-carousel-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #dc2626;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .urgent-carousel-header h3 i {
+        font-size: 1.1rem;
+        animation: urgentPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes urgentPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.15); }
+    }
+    .urgent-carousel-track-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+    /* Arrows INSIDE the track, overlaid left & right */
+    .urgent-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.92);
+        color: #dc2626;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.82rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .urgent-carousel-btn:hover {
+        background: white;
+        box-shadow: 0 4px 14px rgba(220,38,38,0.25);
+        transform: translateY(-50%) scale(1.08);
+    }
+    .urgent-carousel-btn:disabled {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .urgent-carousel-btn.prev-btn {
+        left: 6px;
+    }
+    .urgent-carousel-btn.next-btn {
+        right: 6px;
+    }
+    .urgent-carousel-track {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 4px 2px 8px;
+    }
+    .urgent-carousel-track::-webkit-scrollbar {
+        display: none;
+    }
+    /* 4 cards per row: calc((100% - 3*10px gap) / 4) */
+    .urgent-card {
+        flex: 0 0 calc((100% - 30px) / 4);
+        min-width: 140px;
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #fecaca;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.25s;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+    }
+    .urgent-card:hover {
+        border-color: #dc2626;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(220,38,38,0.15);
+        color: inherit;
+    }
+    .urgent-card-img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fca5a5;
+        font-size: 2rem;
+    }
+    .urgent-card-img img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+    .urgent-card-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: white;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .urgent-card-body {
+        padding: 10px 12px 12px;
+    }
+    .urgent-card-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .urgent-card-meta {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .urgent-card-price {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #dc2626;
+        margin-top: 4px;
+    }
+    .urgent-card-countdown {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.65);
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    /* =========================================
+       PUBLICATION STYLE FACEBOOK - Fil d'actualité
+       ========================================= */
+    .missions-feed {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin: 0;
+    }
+
+    /* --- Post container --- */
+    .fb-post {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e4e6eb;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    /* --- Post header: avatar + name + meta --- */
+    .fb-post-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px 0;
+    }
+
+    .fb-post-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .fb-post-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fb-post-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .fb-post-header-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .fb-post-author {
+        font-weight: 600;
+        font-size: 0.94rem;
+        color: #050505;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+
+    .fb-post-author:hover {
+        text-decoration: underline;
+    }
+
+    .fb-post-badge {
+        display: inline-block;
+        background: #e7f3ff;
+        color: #1877f2;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+
+    .fb-post-meta {
+        font-size: 0.78rem;
+        color: #65676b;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .fb-post-meta i {
+        font-size: 0.65rem;
+    }
+
+    .fb-post-options {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: #65676b;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 50%;
+        transition: background 0.15s;
+    }
+
+    .fb-post-options:hover {
+        background: #f0f2f5;
+    }
+
+    /* --- Post body: title + description + price + tags --- */
+    .fb-post-body {
+        padding: 10px 16px;
+    }
+
+    .fb-post-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #050505;
+        margin-bottom: 4px;
+        line-height: 1.35;
+    }
+
+    .fb-post-text {
+        font-size: 0.93rem;
+        color: #050505;
+        line-height: 1.5;
+        word-break: break-word;
+        margin-bottom: 6px;
+    }
+
+    .fb-post-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .fb-post-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #f0f2f5;
+        color: #65676b;
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 16px;
+        font-weight: 500;
+    }
+
+    .fb-post-tag.price {
+        background: #e6f8ee;
+        color: #059669;
+        font-weight: 700;
+    }
+
+    .fb-post-tag.urgent {
+        background: #fee2e2;
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    /* --- Post photos --- */
+    .fb-post-photos {
+        width: 100%;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .fb-post-photos.single img {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .fb-post-photos.multi {
+        display: grid;
+        gap: 2px;
+    }
+
+    .fb-post-photos.multi.two {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .fb-post-photos.multi.three-plus {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    .fb-post-photos.multi.three-plus .fb-photo-item:first-child {
+        grid-row: 1 / 3;
+    }
+
+    .fb-photo-item {
+        overflow: hidden;
+        position: relative;
+        background: #e4e6eb;
+    }
+
+    .fb-photo-item img {
+        width: 100%;
+        height: 100%;
+        min-height: 200px;
+        max-height: 500px;
+        object-fit: cover;
+        display: block;
+        transition: opacity 0.15s;
+    }
+
+    .fb-photo-item:hover img {
+        opacity: 0.95;
+    }
+
+    .fb-photo-more-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .fb-post-no-photo {
+        width: 100%;
+        height: 120px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+
+    /* --- Reactions count bar --- */
+    .fb-post-reactions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        font-size: 0.83rem;
+        color: #65676b;
+    }
+
+    .fb-post-reactions-bar .reactions-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fb-post-reactions-bar .reactions-right {
+        display: flex;
+        gap: 12px;
+    }
+
+    .fb-post-reactions-bar .reactions-right span {
+        cursor: pointer;
+    }
+
+    .fb-post-reactions-bar .reactions-right span:hover {
+        text-decoration: underline;
+    }
+
+    /* --- Action buttons bar (Like / Comment / Share / Contact) --- */
+    .fb-post-actions {
+        display: flex;
+        border-top: 1px solid #e4e6eb;
+        border-bottom: 1px solid #e4e6eb;
+        margin: 0 16px;
+    }
+
+    .fb-action-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 0;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #65676b;
+        background: none;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.15s;
+    }
+
+    .fb-action-btn:hover {
+        background: #f0f2f5;
+    }
+
+    .fb-action-btn.liked {
+        color: #1877f2;
+    }
+
+    .fb-action-btn i {
+        font-size: 1rem;
+    }
+
+    .fb-action-btn.contact-btn {
+        color: #1877f2;
+    }
+
+    /* --- Inline comments section --- */
+    .fb-post-comments {
+        padding: 8px 16px 12px;
+    }
+
+    .fb-comments-list {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-bottom: 8px;
+    }
+
+    .fb-comment-form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .fb-comment-form .fb-comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .fb-comment-form .fb-comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fb-comment-input-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        background: #f0f2f5;
+        border-radius: 20px;
+        padding: 0 6px 0 14px;
+    }
+
+    .fb-comment-input-wrap input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 0.88rem;
+        padding: 8px 0;
+        outline: none;
+        color: #050505;
+    }
+
+    .fb-comment-input-wrap input::placeholder {
+        color: #8e8e8e;
+    }
+
+    .fb-comment-send-btn {
+        background: none;
+        border: none;
+        color: #1877f2;
+        font-size: 0.95rem;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 50%;
+        transition: background 0.15s;
+    }
+
+    .fb-comment-send-btn:hover:not(:disabled) {
+        background: #e7f3ff;
+    }
+
+    .fb-comment-send-btn:disabled {
+        color: #bec3c9;
+        cursor: default;
+    }
+
+    .no-comments-msg {
+        text-align: center;
+        color: #8e8e8e;
+        font-size: 0.82rem;
+        padding: 8px 0;
+    }
+    .mission-photos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .mission-photos.single-photo {
+        grid-template-columns: 1fr;
+    }
+
+    .mission-photos.single-photo .mission-photo {
+        height: 300px;
+    }
+
+    .mission-photos.two-photos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mission-photo {
+        height: 160px;
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        background: #e2e8f0;
+    }
+
+    .mission-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s;
+    }
+
+    .mission-photo:hover img {
+        transform: scale(1.03);
+    }
+
+    .mission-photo-more {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* =========================================
+       STATS INLINE BADGES
+       ========================================= */
+    .mission-stats-inline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #65676b;
+        font-size: 0.8rem;
+    }
+
+    .stat-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .stat-badge i {
+        font-size: 0.75rem;
+    }
+
+    /* =========================================
+       PHOTO LIGHTBOX
+       ========================================= */
+    .photo-lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .photo-lightbox.active {
+        display: flex;
+    }
+
+    .photo-lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .photo-lightbox-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .photo-lightbox img {
+        max-width: 95%;
+        max-height: 95%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .photo-lightbox-title {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 8px 20px;
+        border-radius: 20px;
+        max-width: 80%;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* =========================================
+       BOUTON 3 POINTS (MENU)
+       ========================================= */
+    .btn-three-dots {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: #65676b;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .btn-three-dots:hover {
+        background: #f0f2f5;
+    }
+
+    .btn-three-dots i {
+        font-size: 1rem;
+    }
+
+    /* =========================================
+       BOUTONS ACTIONS SOCIALES AMÉLIORÉS
+       ========================================= */
+    .mission-actions {
+        display: flex;
+        justify-content: space-around;
+        padding: 6px 12px;
+        border-top: 1px solid #f1f5f9;
+        background: white;
+        gap: 6px;
+        position: relative;
+        z-index: 5;
+    }
+
+    .mission-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 6px 10px;
+        border: none;
+        background: transparent;
+        color: #65676b;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        flex: 0 1 auto;
+    }
+
+    .mission-action-btn:hover {
+        background: #f0f2f5;
+        color: #1e293b;
+    }
+
+    .mission-action-btn.liked {
+        color: #dc2626;
+        background: #fef2f2;
+    }
+
+    .mission-action-btn.liked i {
+        animation: pulse 0.3s ease;
+    }
+
+    .mission-action-btn.active-comments {
+        color: var(--primary);
+        background: #eff6ff;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    /* =========================================
+       MENU DE PARTAGE AMÉLIORÉ
+       ========================================= */
+    .share-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        transform: scale(0.95);
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        padding: 12px;
+        min-width: 220px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        z-index: 1000;
+    }
+
+    .share-menu.open {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+    }
+
+    .share-menu-header {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        padding: 8px 12px;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 8px;
+    }
+
+    .share-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-size: 0.9rem;
+        color: #1e293b;
+    }
+
+    .share-option:hover {
+        background: #f8fafc;
+    }
+
+    .share-option i {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .share-option.copy i { background: #f1f5f9; color: #64748b; }
+    .share-option.twitter i { background: #e0f2fe; color: #0ea5e9; }
+    .share-option.facebook i { background: #dbeafe; color: #2563eb; }
+    .share-option.linkedin i { background: #e0e7ff; color: #4f46e5; }
+    .share-option.whatsapp i { background: #dcfce7; color: #16a34a; }
+
+    .share-option.copied {
+        color: #16a34a;
+    }
+
+    .share-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+
+    .mission-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 14px;
+        color: #65676b;
+        font-size: 0.8rem;
+    }
+
+    .mission-stats span {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .mission-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 14px;
+        background: white;
+    }
+
+    .mission-price {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #059669;
+        background: #ecfdf5;
+        padding: 5px 12px;
+        border-radius: 18px;
+    }
+
+    .mission-badges {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .mission-badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .mission-badge-urgent {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .mission-badge-category {
+        background: #eff6ff;
+        color: var(--primary);
+    }
+
+    /* =========================================
+       SIDEBAR TOP PROS
+       ========================================= */
+    .top-pros-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e2e8f0;
+    }
+
+    .top-pros-header {
+        padding: 16px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .top-pros-header h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .top-pros-header h3 i {
+        color: #eab308;
+    }
+
+    .top-pros-list {
+        padding: 8px 0;
+    }
+
+    .top-pro-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+    }
+
+    .top-pro-item:hover {
+        background: #f8fafc;
+    }
+
+    .top-pro-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 2px solid #e2e8f0;
+    }
+
+    .top-pro-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .top-pro-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .top-pro-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .top-pro-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .top-pro-category {
+        font-size: 0.75rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .top-pro-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+    }
+
+    .top-pro-rating .star {
+        color: #eab308;
+    }
+
+    .top-pro-rating span {
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .top-pro-rank {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .top-pro-rank.gold {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: white;
+    }
+
+    .top-pro-rank.silver {
+        background: linear-gradient(135deg, #9ca3af, #6b7280);
+        color: white;
+    }
+
+    .top-pro-rank.bronze {
+        background: linear-gradient(135deg, #d97706, #b45309);
+        color: white;
+    }
+
+    .top-pro-rank.normal {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .top-pros-footer {
+        padding: 12px 16px;
+        border-top: 1px solid #f1f5f9;
+        text-align: center;
+    }
+
+    .top-pros-footer a {
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .top-pros-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* =========================================
+       SECTION VIDE
+       ========================================= */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: #475569;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* =========================================
+       RESPONSIVE
+       ========================================= */
+    @media (max-width: 768px) {
+        .filter-bar {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 8px;
+        }
+
+        .toggle-group {
+            order: -1;
+            flex-shrink: 0;
+        }
+
+        .providers-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .missions-feed {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .providers-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .missions-feed {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .providers-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .missions-feed {
+            max-width: 100%;
+        }
+    }
+
+    /* =========================================
+       LOADING STATE
+       ========================================= */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+
+    .loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* =========================================
+       SECTION COMMENTAIRES INLINE AMÉLIORÉE
+       ========================================= */
+    .comments-section-inline {
+        display: none;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        border-radius: 0 0 16px 16px;
+        overflow: hidden;
+        animation: slideDown 0.3s ease;
+    }
+
+    .comments-section-inline.open {
+        display: block;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comments-header {
+        padding: 14px 16px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .comments-header h5 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comments-close-btn {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 50%;
+        transition: all 0.2s;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .comments-close-btn:hover {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .comments-list-inline {
+        max-height: 350px;
+        overflow-y: auto;
+        padding: 12px 16px;
+    }
+
+    .comment-item-inline {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        animation: fadeInComment 0.3s ease;
+    }
+
+    .comment-item-inline:last-child {
+        margin-bottom: 0;
+    }
+
+    @keyframes fadeInComment {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comment-avatar-inline {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .comment-avatar-inline img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .comment-avatar-placeholder-inline {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .comment-content-inline {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .comment-bubble {
+        background: white;
+        border-radius: 12px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .comment-author-inline {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .comment-author-inline:hover {
+        color: var(--primary);
+    }
+
+    .comment-text-inline {
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.5;
+        word-break: break-word;
+        margin: 0;
+    }
+
+    .comment-actions-inline {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 6px;
+        padding-left: 4px;
+    }
+
+    .comment-action-btn {
+        font-size: 0.75rem;
+        color: #64748b;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.15s;
+        font-weight: 500;
+    }
+
+    .comment-action-btn:hover {
+        color: var(--primary);
+        background: #eff6ff;
+    }
+
+    .comment-action-btn.liked {
+        color: #dc2626;
+    }
+
+    .comment-time-inline {
+        font-size: 0.7rem;
+        color: #94a3b8;
+    }
+
+    .comments-form-inline {
+        padding: 14px 16px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .comment-input-wrapper {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #f1f5f9;
+        border-radius: 24px;
+        padding: 4px 4px 4px 16px;
+    }
+
+    .comment-input-inline {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 0.9rem;
+        outline: none;
+        padding: 8px 0;
+        color: #1e293b;
+        min-height: 20px;
+    }
+
+    .comment-input-inline::placeholder {
+        color: #94a3b8;
+    }
+
+    .comment-submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .comment-submit-btn:hover:not(:disabled) {
+        background: var(--primary-dark);
+        transform: scale(1.05);
+    }
+
+    .comment-submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .no-comments-inline {
+        text-align: center;
+        padding: 30px 20px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .no-comments-inline i {
+        font-size: 2rem;
+        margin-bottom: 12px;
+        display: block;
+        color: #cbd5e1;
+    }
+
+    .login-to-comment {
+        text-align: center;
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .login-to-comment a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-to-comment a:hover {
+        text-decoration: underline;
+    }
+
+    /* Voir plus de commentaires */
+    .load-more-comments {
+        text-align: center;
+        padding: 12px;
+        color: var(--primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .load-more-comments:hover {
+        background: #f8fafc;
+    }
+
+    /* =========================================
+       POPUP DETAIL PUBLICATION
+       ========================================= */
+    .ad-detail-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+    .ad-detail-overlay.active {
+        display: flex;
+    }
+
+    .ad-detail-popup {
+        background: white;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        animation: popupSlideIn 0.3s ease;
+        position: relative;
+    }
+
+    @keyframes popupSlideIn {
+        from { opacity: 0; transform: translateY(30px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .ad-detail-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+    }
+
+    .ad-detail-close:hover {
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .ad-detail-photos {
+        position: relative;
+        width: 100%;
+        background: #f1f5f9;
+    }
+
+    .ad-detail-photos-grid {
+        display: grid;
+        gap: 3px;
+    }
+
+    .ad-detail-photos-grid.single { grid-template-columns: 1fr; }
+    .ad-detail-photos-grid.double { grid-template-columns: repeat(2, 1fr); }
+    .ad-detail-photos-grid.triple { grid-template-columns: repeat(3, 1fr); }
+
+    .ad-detail-photo {
+        height: 280px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .ad-detail-photos-grid.double .ad-detail-photo,
+    .ad-detail-photos-grid.triple .ad-detail-photo {
+        height: 200px;
+    }
+
+    .ad-detail-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .ad-detail-photo:hover img {
+        transform: scale(1.03);
+    }
+
+    .ad-detail-no-photo {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        font-size: 3rem;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .ad-detail-content {
+        padding: 20px 24px;
+    }
+
+    .ad-detail-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .ad-detail-user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .ad-detail-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .ad-detail-user-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .ad-detail-user-info h4 {
+        margin: 0 0 2px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .ad-detail-user-info p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    .ad-detail-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+
+    .ad-detail-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .ad-detail-badges .badge-item {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .ad-detail-badges .badge-category {
+        background: #eff6ff;
+        color: var(--primary);
+    }
+
+    .ad-detail-badges .badge-urgent {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .ad-detail-badges .badge-location {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .ad-detail-badges .badge-reply {
+        background: #fefce8;
+        color: #ca8a04;
+    }
+
+    .ad-detail-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 16px;
+    }
+
+    .ad-detail-description {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #475569;
+        margin-bottom: 20px;
+        white-space: pre-line;
+    }
+
+    .ad-detail-actions {
+        display: flex;
+        gap: 10px;
+        padding: 14px 24px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .ad-detail-actions button,
+    .ad-detail-actions a {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .ad-detail-btn-like {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .ad-detail-btn-like:hover {
+        background: #fee2e2;
+    }
+
+    .ad-detail-btn-like.liked {
+        background: #dc2626;
+        color: white;
+    }
+
+    .ad-detail-btn-contact {
+        background: var(--primary);
+        color: white;
+    }
+
+    .ad-detail-btn-contact:hover {
+        opacity: 0.9;
+    }
+
+    .ad-detail-btn-share {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .ad-detail-btn-share:hover {
+        background: #e2e8f0;
+    }
+
+    .ad-detail-btn-save {
+        background: #fefce8;
+        color: #ca8a04;
+    }
+
+    .ad-detail-btn-save:hover {
+        background: #fef9c3;
+    }
+
+    /* Comments section inside popup */
+    .ad-detail-comments {
+        border-top: 1px solid #e2e8f0;
+        padding: 16px 24px;
+    }
+
+    .ad-detail-comments h5 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ad-detail-comments .comments-list-inline {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .ad-detail-comments .comment-form-inline {
+        margin-top: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .ad-detail-popup {
+            max-width: 100%;
+            max-height: 95vh;
+            margin: 10px;
+            border-radius: 12px;
+        }
+
+        .ad-detail-photo {
+            height: 200px;
+        }
+
+        .ad-detail-actions {
+            flex-wrap: wrap;
+        }
+
+        .ad-detail-actions button,
+        .ad-detail-actions a {
+            flex: 1 1 45%;
+        }
+    }
+
+    /* =========================================
+       TOAST NOTIFICATIONS AMÉLIORÉES
+       ========================================= */
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toast-custom {
+        background: white;
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 280px;
+        animation: slideInToast 0.3s ease;
+    }
+
+    @keyframes slideInToast {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .toast-custom.success {
+        border-left: 4px solid #22c55e;
+    }
+
+    .toast-custom.error {
+        border-left: 4px solid #ef4444;
+    }
+
+    .toast-custom.info {
+        border-left: 4px solid var(--primary);
+    }
+
+    .toast-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .toast-custom.success .toast-icon {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .toast-custom.error .toast-icon {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .toast-custom.info .toast-icon {
+        background: #eff6ff;
+        color: var(--primary);
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 2px;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        transition: all 0.15s;
+    }
+
+    .toast-close:hover {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    /* =========================================
+       GEOLOCATION INDICATOR & RADIUS
+       ========================================= */
+    .geo-banner {
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        border-bottom: 1px solid #c7d2fe;
+        padding: 8px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: #4338ca;
+    }
+
+    .geo-banner-icon {
+        font-size: 1rem;
+        color: #6366f1;
+    }
+
+    .geo-banner-text {
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .geo-banner-city {
+        font-weight: 700;
+        color: #312e81;
+    }
+
+    .geo-radius-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        border-radius: 20px;
+        padding: 4px 14px;
+        border: 1px solid #c7d2fe;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .geo-radius-control label {
+        font-size: 0.78rem;
+        color: #6366f1;
+        font-weight: 600;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .geo-radius-select {
+        border: none;
+        background: transparent;
+        color: #312e81;
+        font-weight: 700;
+        font-size: 0.82rem;
+        cursor: pointer;
+        padding: 2px 4px;
+        outline: none;
+    }
+
+    .geo-radius-select:focus {
+        outline: none;
+    }
+
+    .geo-banner-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .geo-btn-precise {
+        background: white;
+        border: 1px solid #c7d2fe;
+        color: #6366f1;
+        font-size: 0.75rem;
+        padding: 3px 10px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 500;
+    }
+
+    .geo-btn-precise:hover {
+        background: #6366f1;
+        color: white;
+        border-color: #6366f1;
+    }
+
+    .geo-btn-disable {
+        background: transparent;
+        border: none;
+        color: #a5b4fc;
+        font-size: 0.78rem;
+        cursor: pointer;
+        padding: 2px 6px;
+        transition: color 0.2s;
+    }
+
+    .geo-btn-disable:hover {
+        color: #ef4444;
+    }
+
+    .geo-source-badge {
+        font-size: 0.68rem;
+        background: #c7d2fe;
+        color: #4338ca;
+        padding: 1px 7px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .geo-banner {
+            padding: 6px 12px;
+            gap: 8px;
+            font-size: 0.78rem;
+        }
+        .geo-radius-control {
+            padding: 3px 10px;
+        }
+    }
+</style>
+@endpush
+
+@section('content')
+
+<!-- Barre de Filtres (fixée au header) -->
+<div class="filter-bar-container">
+    <div class="filter-bar">
+        <!-- Toggle Pro / Offre -->
+        <div class="toggle-group">
+            <button class="toggle-btn" id="togglePro" onclick="setViewMode('providers')">
+                <i class="fas fa-user-tie me-1"></i> Je cherche un Pro
+            </button>
+            <button class="toggle-btn active" id="toggleMission" onclick="setViewMode('missions')">
+                <i class="fas fa-briefcase me-1"></i> Je cherche une offre
+            </button>
+        </div>
+
+        <div class="filter-separator"></div>
+
+        <!-- Catégorie -->
+        <div class="filter-dropdown" id="categoryDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('categoryDropdown')">
+                <i class="fas fa-folder"></i>
+                <span id="categoryLabel">Catégorie</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" id="categoryMenu">
+                <div class="filter-menu-item selected" data-value="" onclick="selectCategory('')">
+                    <i class="fas fa-check"></i> Toutes les catégories
+                </div>
+                @foreach($missionCategories as $catName => $catData)
+                <div class="filter-menu-item" data-value="{{ $catName }}" onclick="selectCategory('{{ $catName }}')">
+                    <i class="{{ $catData['icon'] ?? 'fas fa-folder' }}"></i> {{ $catName }}
+                    <span class="ms-auto text-muted small">{{ $catData['total'] ?? 0 }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Sous-catégorie -->
+        <div class="filter-dropdown" id="subcategoryDropdown" style="display: none;">
+            <button class="filter-btn" onclick="toggleDropdown('subcategoryDropdown')">
+                <i class="fas fa-tags"></i>
+                <span id="subcategoryLabel">Sous-catégorie</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" id="subcategoryMenu">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Filtre par -->
+        <div class="filter-dropdown" id="sortDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('sortDropdown')">
+                <i class="fas fa-sort-amount-down"></i>
+                <span id="sortLabel">Trier</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu">
+                <div class="filter-menu-item selected" data-value="recommended" onclick="selectSort('recommended')">
+                    <i class="fas fa-star"></i> Recommandé
+                </div>
+                <div class="filter-menu-item" data-value="recent" onclick="selectSort('recent')">
+                    <i class="fas fa-clock"></i> Plus récent
+                </div>
+                <div class="filter-menu-item" data-value="urgent" onclick="selectSort('urgent')">
+                    <i class="fas fa-bolt"></i> Urgent
+                </div>
+                @if($geoEnabled ?? false)
+                <div class="filter-menu-item" data-value="proximity" onclick="selectSort('proximity')">
+                    <i class="fas fa-map-marker-alt"></i> Proximité
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Localisation -->
+        <div class="filter-dropdown" id="locationDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('locationDropdown')">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="locationLabel">Localisation</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" style="min-width: 280px;">
+                <div style="padding: 12px;">
+                    <label class="form-label small text-muted mb-1">Pays</label>
+                    <select class="form-select form-select-sm mb-2" id="countrySelect" onchange="updateFilterCities()">
+                        <option value="">-- Sélectionner un pays --</option>
+                        <optgroup label="France - Outre-mer">
+                            <option value="Mayotte">Mayotte</option>
+                            <option value="La Réunion">La Réunion</option>
+                            <option value="Guadeloupe">Guadeloupe</option>
+                            <option value="Martinique">Martinique</option>
+                            <option value="Guyane">Guyane</option>
+                        </optgroup>
+                        <optgroup label="Océan Indien">
+                            <option value="Madagascar">Madagascar</option>
+                            <option value="Maurice">Maurice</option>
+                        </optgroup>
+                        <optgroup label="Europe">
+                            <option value="France">France</option>
+                            <option value="Belgique">Belgique</option>
+                            <option value="Suisse">Suisse</option>
+                        </optgroup>
+                        <optgroup label="Afrique">
+                            <option value="Sénégal">Sénégal</option>
+                            <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                            <option value="Maroc">Maroc</option>
+                            <option value="Tunisie">Tunisie</option>
+                            <option value="Algérie">Algérie</option>
+                        </optgroup>
+                        <optgroup label="Amérique">
+                            <option value="Canada">Canada</option>
+                        </optgroup>
+                    </select>
+                    
+                    <label class="form-label small text-muted mb-1">Ville</label>
+                    <select class="form-select form-select-sm mb-2" id="citySelect" disabled>
+                        <option value="">-- Sélectionner une ville --</option>
+                    </select>
+                    
+                    <div id="customCityWrapper" style="display: none;">
+                        <input type="text" class="form-control form-control-sm mb-2" placeholder="Saisir une ville" id="cityInput">
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="resetLocationFilter()">
+                            <i class="fas fa-times me-1"></i> Réinitialiser
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-grow-1" onclick="applyLocationFilter()">
+                            <i class="fas fa-check me-1"></i> Appliquer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prix -->
+        <div class="filter-dropdown" id="priceDropdown">
+            <button class="filter-btn" onclick="toggleDropdown('priceDropdown')">
+                <i class="fas fa-euro-sign"></i>
+                <span id="priceLabel">Prix</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </button>
+            <div class="filter-menu" style="min-width: 250px;">
+                <div style="padding: 12px;">
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Min €" id="priceMin">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Max €" id="priceMax">
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(0, 50)">0-50€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(50, 100)">50-100€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(100, 500)">100-500€</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="setPriceRange(500, null)">500€+</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-danger btn-sm flex-grow-1" onclick="resetPriceFilter()">
+                            <i class="fas fa-times me-1"></i> Réinitialiser
+                        </button>
+                        <button class="btn btn-primary btn-sm flex-grow-1" onclick="applyPriceFilter()">
+                            <i class="fas fa-check me-1"></i> Appliquer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Spacer pour compenser la barre fixe -->
+<div class="filter-bar-spacer"></div>
+
+<!-- Géolocalisation Banner -->
+@if($geoEnabled ?? false)
+<div class="geo-banner" id="geoBanner">
+    <span class="geo-banner-icon"><i class="fas fa-map-marker-alt"></i></span>
+    <span class="geo-banner-text">
+        Annonces proches de
+        <span class="geo-banner-city" id="geoCityLabel">{{ $geoCity ?? 'votre position' }}@if($geoCountry ?? false), {{ $geoCountry }}@endif</span>
+        <span class="geo-source-badge" id="geoSourceBadge">
+            @if(($geoSource ?? '') === 'browser') Ma position
+            @elseif(($geoSource ?? '') === 'profile') Mon adresse
+            @elseif(($geoSource ?? '') === 'ip') Localisation approximative
+            @else Détection auto
+            @endif
+        </span>
+    </span>
+    <div class="geo-radius-control">
+        <label><i class="fas fa-bullseye me-1"></i>Rayon</label>
+        <select class="geo-radius-select" id="geoRadiusSelect" onchange="changeGeoRadius(this.value)">
+            <option value="5" {{ ($userRadius ?? 50) == 5 ? 'selected' : '' }}>5 km</option>
+            <option value="10" {{ ($userRadius ?? 50) == 10 ? 'selected' : '' }}>10 km</option>
+            <option value="25" {{ ($userRadius ?? 50) == 25 ? 'selected' : '' }}>25 km</option>
+            <option value="50" {{ ($userRadius ?? 50) == 50 ? 'selected' : '' }}>50 km</option>
+            <option value="100" {{ ($userRadius ?? 50) == 100 ? 'selected' : '' }}>100 km</option>
+            <option value="200" {{ ($userRadius ?? 50) == 200 ? 'selected' : '' }}>200 km</option>
+            <option value="500" {{ ($userRadius ?? 50) == 500 ? 'selected' : '' }}>500 km</option>
+        </select>
+    </div>
+    <div class="geo-banner-actions">
+        <button class="geo-btn-precise" id="geoPreciseBtn" onclick="requestBrowserGeolocation()" title="Utiliser votre GPS pour une localisation précise">
+            <i class="fas fa-crosshairs"></i> Préciser
+        </button>
+        <button class="geo-btn-disable" onclick="disableGeoFiltering()" title="Voir toutes les annonces sans filtre géographique">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+@endif
+
+<!-- Contenu Principal -->
+<div class="content-container">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Section Prestataires (cachée par défaut) -->
+    <div id="providersSection" style="display: none;">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold mb-1" id="providersSectionTitle">Nos meilleurs prestataires</h2>
+            <p class="text-muted mb-0" id="providersSectionSubtitle">Professionnels vérifiés et recommandés</p>
+        </div>
+        <div class="providers-grid" id="providersGrid">
+            @if(isset($premiumPros) && $premiumPros->count() > 0)
+                @foreach($premiumPros as $pro)
+                <a href="{{ route('profile.public', $pro->id) }}" class="provider-card">
+                    <div class="provider-image-wrapper">
+                        @if($pro->avatar)
+                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}">
+                        @else
+                            <div class="provider-image-placeholder">
+                                {{ strtoupper(substr($pro->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        @if($pro->profession)
+                        <div class="provider-badge-top"><i class="fas fa-briefcase"></i> {{ Str::limit($pro->profession, 25) }}</div>
+                        @elseif($pro->service_category)
+                        <div class="provider-badge-top"><i class="fas fa-briefcase"></i> {{ Str::limit($pro->service_category, 25) }}</div>
+                        @endif
+                    </div>
+                    <div class="provider-card-info">
+                        <div class="provider-info-header">
+                            <h3 class="provider-name">
+                                {{ Str::limit($pro->name, 18) }}
+                                @if($pro->user_type === 'professionnel' || $pro->hasActiveProSubscription() || $pro->hasCompletedProOnboarding())
+                                <span class="badge-pro">PRO</span>
+                                @endif
+                            </h3>
+                            @if($pro->hourly_rate)
+                            <span class="provider-price">{{ $pro->hourly_rate }} €/h</span>
+                            @endif
+                        </div>
+                        <div class="provider-rating">
+                            <span class="star-icon">★</span>
+                            <span class="rating-value">{{ $pro->reviews_avg_rating ? number_format($pro->reviews_avg_rating, 1, ',', '') : 'Nouveau' }}</span>
+                            <span class="reviews-count">({{ $pro->reviews_count ?? 0 }} avis)</span>
+                        </div>
+                        @if($pro->bio)
+                        <p class="provider-category">{{ Str::limit($pro->bio, 40) }}</p>
+                        @endif
+                    </div>
+                </a>
+                @endforeach
+            @else
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-users"></i>
+                    <h3>Aucun prestataire disponible</h3>
+                    <p>Revenez bientôt pour découvrir nos professionnels</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Section Missions (affichée par défaut) -->
+    <div id="missionsSection">
+        
+        <div class="text-center mb-4" style="max-width: 1060px; margin: 0 auto;">
+            <h2 class="fw-bold mb-1" style="color: var(--text-dark); font-size: 1.5rem;" id="missionsSectionTitle">
+                <i class="fas fa-fire" style="color: var(--accent); margin-right: 6px;"></i>Dernières missions disponibles
+            </h2>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;" id="missionsSectionSubtitle">Trouvez des opportunités près de chez vous</p>
+        </div>
+        
+        <!-- Layout 2 colonnes: Feed (gauche) + Sidebar (droite) -->
+        <div class="feed-layout">
+            <!-- Sidebar utilisateur (affichée à gauche via CSS order: 1) -->
+            <div class="feed-sidebar-left">
+                {{-- Verification status alert in sidebar --}}
+                @php
+                    $feedVerification = \App\Models\IdentityVerification::where('user_id', Auth::id())->latest()->first();
+                @endphp
+                @if($feedVerification && $feedVerification->status === 'returned')
+                <a href="{{ route('verification.index') }}" style="display: block; background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none; transition: transform 0.15s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(245,158,11,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas fa-exclamation-triangle" style="color: #d97706;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #b45309; font-size: 0.82rem;">Corrections requises</div>
+                            <div style="font-size: 0.72rem; color: #92400e; line-height: 1.3;">Votre vérification nécessite des modifications</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: #d97706; margin-left: auto; font-size: 0.7rem;"></i>
+                    </div>
+                </a>
+                @elseif($feedVerification && $feedVerification->status === 'pending')
+                <a href="{{ route('verification.index') }}" style="display: block; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #93c5fd; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(59,130,246,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas fa-clock" style="color: #2563eb;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #1e40af; font-size: 0.82rem;">Vérification en cours</div>
+                            <div style="font-size: 0.72rem; color: #3b82f6; line-height: 1.3;">Vos documents sont en cours d'examen</div>
+                        </div>
+                    </div>
+                </a>
+                @elseif($feedVerification && $feedVerification->status === 'rejected')
+                <a href="{{ route('verification.index') }}" style="display: block; background: linear-gradient(135deg, #fef2f2, #fee2e2); border: 1px solid #fca5a5; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(239,68,68,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas fa-times-circle" style="color: #dc2626;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #dc2626; font-size: 0.82rem;">Vérification refusée</div>
+                            <div style="font-size: 0.72rem; color: #991b1b; line-height: 1.3;">Soumettez une nouvelle demande</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: #dc2626; margin-left: auto; font-size: 0.7rem;"></i>
+                    </div>
+                </a>
+                @elseif(!Auth::user()->is_verified)
+                <a href="{{ route('verification.index') }}" style="display: block; background: linear-gradient(135deg, #ecfdf5, #d1fae5); border: 1px solid #86efac; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas fa-shield-alt" style="color: #059669;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #059669; font-size: 0.82rem;">Vérifiez votre profil</div>
+                            <div style="font-size: 0.72rem; color: #16a34a; line-height: 1.3;">Obtenez le badge vérifié</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: #059669; margin-left: auto; font-size: 0.7rem;"></i>
+                    </div>
+                </a>
+                @endif
+
+                <div class="sidebar-menu-card">
+                    <div class="sidebar-menu-links">
+                        <a class="sidebar-menu-link" href="{{ route('profile.show') }}">
+                            <i class="fas fa-user"></i> Mon profil
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('ads.myads') }}">
+                            <i class="fas fa-briefcase"></i> Mes annonces
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('pro.dashboard') }}">
+                            <i class="fas fa-crown" style="color: #7c3aed;"></i> Espace Pro
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('quote-tool.landing') }}">
+                            <i class="fas fa-file-invoice" style="color: #16a34a;"></i> Devis & Factures
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('messages.index') }}">
+                            <i class="fas fa-comments"></i> Messages
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('saved-ads.index') }}">
+                            <i class="fas fa-bookmark"></i> Favoris
+                        </a>
+                        <a class="sidebar-menu-link" href="{{ route('settings.index') }}">
+                            <i class="fas fa-cog"></i> Parametres
+                        </a>
+                    </div>
+
+                    <form class="sidebar-menu-logout" method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit">
+                            <i class="fas fa-sign-out-alt"></i> Deconnexion
+                        </button>
+                    </form>
+                </div>
+
+                <div class="sidebar-left-widgets">
+                    <!-- CTA Pro -->
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px;">
+                        <h3 style="font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-bottom: 6px;">Developpez votre activite</h3>
+                        <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px; line-height: 1.4;">Repondez aux demandes pres de chez vous.</p>
+                        <a href="{{ route('ads.create') }}" style="display: block; text-align: center; background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-decoration: none; transition: background 0.15s;">
+                            <i class="fas fa-plus" style="margin-right: 6px; font-size: 0.75rem;"></i>Proposer mes services
+                        </a>
+                    </div>
+
+                    <!-- Top Pros -->
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <h3 style="font-size: 0.85rem; font-weight: 600; color: #111827;">
+                                <i class="fas fa-crown" style="color: #f59e0b; margin-right: 6px;"></i>Top Pros
+                            </h3>
+                        </div>
+                        <div>
+                            @if(isset($topPros) && $topPros->count() > 0)
+                                @foreach($topPros as $index => $pro)
+                                <a href="{{ route('profile.public', $pro->id) }}" style="display: flex; align-items: center; gap: 10px; padding: 8px 0; text-decoration: none; border-bottom: 1px solid #f3f4f6; {{ $index == $topPros->count() - 1 ? 'border-bottom: none;' : '' }}">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+                                        @if($pro->avatar)
+                                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <div style="width: 100%; height: 100%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; color: #6b7280; font-weight: 600; font-size: 0.75rem;">
+                                                {{ strtoupper(substr($pro->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 500; color: #111827; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $pro->name }}</div>
+                                        <div style="font-size: 0.7rem; color: #9ca3af;">{{ Str::limit($pro->bio, 20) ?? 'Professionnel' }}</div>
+                                    </div>
+                                    <div style="color: #f59e0b; font-weight: 600; font-size: 0.75rem;">
+                                        {{ number_format($pro->verified_reviews_avg ?? 0, 1, ',', '') }}
+                                    </div>
+                                </a>
+                                @endforeach
+                            @else
+                                <div style="text-align: center; padding: 16px; color: #9ca3af; font-size: 0.75rem;">
+                                    Aucun pro classe pour le moment
+                                </div>
+                            @endif
+                        </div>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f4f6; text-align: center;">
+                            <a href="{{ route('feed.professionals') }}" style="color: #2563eb; font-weight: 500; font-size: 0.75rem; text-decoration: none;">
+                                Voir tous les pros →
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Colonne principale: Feed des missions -->
+            <div class="feed-main">
+
+                {{-- Smart suggestions pour les professionnels --}}
+                @include('partials.pro-suggestions')
+
+                {{-- === URGENT ADS HORIZONTAL CAROUSEL === --}}
+                @if(isset($urgentAds) && $urgentAds->count() > 0)
+                <div class="urgent-carousel-section">
+                    <div class="urgent-carousel-header">
+                        <h3><i class="fas fa-fire"></i> Publications urgentes</h3>
+                    </div>
+                    <div class="urgent-carousel-track-wrapper">
+                        <button class="urgent-carousel-btn prev-btn" onclick="scrollUrgentCarousel(-1)" id="urgentPrev" title="Précédent">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="urgent-carousel-btn next-btn" onclick="scrollUrgentCarousel(1)" id="urgentNext" title="Suivant">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="urgent-carousel-track" id="urgentCarouselTrack">
+                            @foreach($urgentAds as $uAd)
+                            @php
+                                $uPhotos = $uAd->photos ?? [];
+                                if (is_string($uPhotos)) {
+                                    $dec = json_decode($uPhotos, true);
+                                    $uPhotos = is_array($dec) ? $dec : (trim($uPhotos) !== '' ? [$uPhotos] : []);
+                                }
+                                $urgentDaysLeft = $uAd->urgent_until ? (int) now()->diffInDays($uAd->urgent_until, false) : null;
+                            @endphp
+                            <a href="{{ route('ads.show', $uAd) }}" class="urgent-card">
+                                <div class="urgent-card-badge">
+                                    <i class="fas fa-fire"></i> URGENT
+                                </div>
+                                @if($urgentDaysLeft !== null)
+                                <div class="urgent-card-countdown">
+                                    <i class="fas fa-clock"></i>
+                                    {{ $urgentDaysLeft > 0 ? $urgentDaysLeft . 'j restant' . ($urgentDaysLeft > 1 ? 's' : '') : 'Dernier jour' }}
+                                </div>
+                                @endif
+                                <div class="urgent-card-img">
+                                    @if(count($uPhotos) > 0)
+                                        <img src="{{ asset('storage/' . $uPhotos[0]) }}" alt="{{ $uAd->title }}">
+                                    @else
+                                        <i class="fas fa-image"></i>
+                                    @endif
+                                </div>
+                                <div class="urgent-card-body">
+                                    <div class="urgent-card-title">{{ $uAd->title }}</div>
+                                    <div class="urgent-card-meta">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        {{ Str::limit($uAd->location ?? $uAd->city ?? 'Non précisé', 20) }}
+                                    </div>
+                                    @if($uAd->price)
+                                    <div class="urgent-card-price">{{ number_format($uAd->price, 0, ',', ' ') }} €</div>
+                                    @endif
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <div class="missions-feed" id="missionsGrid">
+            @forelse($ads as $ad)
+            @php
+                $photos = $ad->photos ?? [];
+                if (is_string($photos)) {
+                    $decoded = json_decode($photos, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        $photos = $decoded;
+                    } elseif (trim($photos) !== '') {
+                        $photos = [$photos];
+                    } else {
+                        $photos = [];
+                    }
+                } elseif (!is_array($photos)) {
+                    $photos = (array) $photos;
+                }
+                $photos = array_values(array_filter($photos));
+                $photoCount = count($photos);
+                $photoUrls = [];
+                foreach ($photos as $p) {
+                    $p = trim($p); $p = ltrim($p, '/');
+                    if (str_starts_with($p, 'http://') || str_starts_with($p, 'https://')) { $photoUrls[] = $p; }
+                    elseif (str_starts_with($p, 'storage/')) { $photoUrls[] = asset($p); }
+                    elseif (str_starts_with($p, 'public/')) { $photoUrls[] = asset('storage/' . str_replace('public/', '', $p)); }
+                    else { $photoUrls[] = asset('storage/' . $p); }
+                }
+                $isNew = $ad->created_at->diffInHours() < 24;
+                $hasProBadge = $ad->user && ($ad->user->user_type === 'professionnel' || $ad->user->hasActiveProSubscription());
+                $commentsCount = $ad->comments()->count();
+
+                // Reply restriction check
+                $adRestriction = $ad->reply_restriction ?? 'everyone';
+                $canReplyToAd = true;
+                $replyRestrictionMsg = '';
+                if (Auth::check() && Auth::id() !== $ad->user_id) {
+                    if ($adRestriction === 'pro_only') {
+                        $u = Auth::user();
+                        $isPro = $u->user_type === 'professionnel' || $u->hasActiveProSubscription() || $u->hasCompletedProOnboarding();
+                        if (!$isPro) {
+                            $canReplyToAd = false;
+                            $replyRestrictionMsg = 'Réservé aux PRO';
+                        }
+                    } elseif ($adRestriction === 'verified_only') {
+                        if (!Auth::user()->is_verified) {
+                            $canReplyToAd = false;
+                            $replyRestrictionMsg = 'Profils vérifiés uniquement';
+                        }
+                    }
+                }
+            @endphp
+
+            <div class="fb-post" data-ad-id="{{ $ad->id }}"
+                 data-ad-json="{{ htmlspecialchars(json_encode([
+                    'id' => $ad->id, 'title' => $ad->title, 'description' => $ad->description,
+                    'category' => $ad->category, 'price' => $ad->price, 'location' => $ad->location,
+                    'photos' => $photos, 'is_urgent' => (bool)$ad->is_urgent,
+                    'reply_restriction' => $ad->reply_restriction ?? 'everyone',
+                    'visibility' => $ad->visibility ?? 'public',
+                    'created_at_human' => $ad->created_at->diffForHumans(),
+                    'user_id' => $ad->user_id, 'comments_count' => $commentsCount,
+                    'shares_count' => $ad->shares_count ?? 0,
+                    'user' => $ad->user ? ['id'=>$ad->user->id,'name'=>$ad->user->name,'avatar'=>$ad->user->avatar,'is_verified'=>(bool)$ad->user->is_verified] : null,
+                 ]), ENT_QUOTES, 'UTF-8') }}">
+
+                {{-- Header: avatar + nom + meta --}}
+                <div class="fb-post-header">
+                    <a href="{{ $ad->user ? route('profile.public', $ad->user->id) : '#' }}" class="fb-post-avatar">
+                        @if($ad->user && $ad->user->avatar)
+                            <img src="{{ asset('storage/' . $ad->user->avatar) }}" alt="{{ $ad->user->name }}">
+                        @else
+                            <div class="fb-post-avatar-placeholder">{{ strtoupper(substr($ad->user->name ?? 'U', 0, 1)) }}</div>
+                        @endif
+                    </a>
+                    <div class="fb-post-header-info">
+                        <a href="{{ $ad->user ? route('profile.public', $ad->user->id) : '#' }}" class="fb-post-author">
+                            {{ $ad->user->name ?? 'Utilisateur' }}
+                            @if($ad->user && $ad->user->is_verified)
+                                <i class="fas fa-check-circle" style="color: #1877f2; font-size: 0.75rem;"></i>
+                            @endif
+                            @if($hasProBadge)
+                                <span class="fb-post-badge">PRO</span>
+                            @endif
+                        </a>
+                        <div class="fb-post-meta">
+                            <span>{{ $ad->created_at->diffForHumans() }}</span>
+                            <span>·</span>
+                            <span>{{ Str::limit($ad->location ?? 'France', 25) }}</span>
+                            @if($ad->is_urgent)
+                                <span>·</span>
+                                <span style="color: #dc2626; font-weight: 600;"><i class="fas fa-bolt"></i> Urgent</span>
+                            @endif
+                        </div>
+                    </div>
+                    <button class="fb-post-options" onclick="event.stopPropagation(); openAdDetail(this.closest('.fb-post'))" title="Voir détails">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+
+                {{-- Body: title + description + tags --}}
+                <div class="fb-post-body">
+                    <div class="fb-post-title">{{ $ad->title }}</div>
+                    <div class="fb-post-text">{{ Str::limit($ad->description, 300) }}</div>
+                    <div class="fb-post-tags">
+                        @if($ad->price)
+                            <span class="fb-post-tag price"><i class="fas fa-tag"></i> {{ number_format($ad->price, 0, ',', ' ') }} €</span>
+                        @else
+                            <span class="fb-post-tag"><i class="fas fa-tag"></i> À discuter</span>
+                        @endif
+                        @if($ad->category)
+                            <span class="fb-post-tag"><i class="fas fa-folder"></i> {{ $ad->category }}</span>
+                        @endif
+                        @if($adRestriction === 'pro_only')
+                            <span class="fb-post-tag" style="background:#dbeafe;color:#2563eb;font-weight:600;"><i class="fas fa-briefcase"></i> PRO uniquement</span>
+                        @elseif($adRestriction === 'verified_only')
+                            <span class="fb-post-tag" style="background:#d1fae5;color:#059669;font-weight:600;"><i class="fas fa-check-circle"></i> Vérifiés uniquement</span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Photos --}}
+                @if($photoCount > 0)
+                <div class="fb-post-photos {{ $photoCount === 1 ? 'single' : 'multi' }} {{ $photoCount === 2 ? 'two' : '' }} {{ $photoCount >= 3 ? 'three-plus' : '' }}"
+                     onclick="openAdDetail(this.closest('.fb-post'))">
+                    @foreach(array_slice($photoUrls, 0, min($photoCount, 4)) as $i => $url)
+                        <div class="fb-photo-item">
+                            <img src="{{ $url }}" alt="{{ $ad->title }}" onerror="this.parentElement.style.display='none';">
+                            @if($i === 3 && $photoCount > 4)
+                                <div class="fb-photo-more-overlay">+{{ $photoCount - 4 }}</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                @endif
+
+                {{-- Reactions count bar --}}
+                <div class="fb-post-reactions-bar">
+                    <div class="reactions-left">
+                        <span>👍</span>
+                        <span class="likes-count-{{ $ad->id }}">0</span>
+                    </div>
+                    <div class="reactions-right">
+                        <span onclick="toggleComments({{ $ad->id }})"><span class="comments-count-{{ $ad->id }}">{{ $commentsCount }}</span> commentaires</span>
+                        <span>{{ $ad->shares_count ?? 0 }} partages</span>
+                    </div>
+                </div>
+
+                {{-- Action buttons --}}
+                <div class="fb-post-actions">
+                    <button class="fb-action-btn" onclick="toggleLike({{ $ad->id }}, this)">
+                        <i class="far fa-thumbs-up"></i> J'aime
+                    </button>
+                    @if($canReplyToAd)
+                        <button class="fb-action-btn" onclick="toggleComments({{ $ad->id }})">
+                            <i class="far fa-comment"></i> Commenter
+                        </button>
+                    @else
+                        <button class="fb-action-btn" style="opacity: 0.45; cursor: not-allowed;" title="{{ $replyRestrictionMsg }}" onclick="alert('{{ $replyRestrictionMsg }}')">
+                            <i class="fas fa-lock" style="font-size: 0.75rem;"></i> Commenter
+                        </button>
+                    @endif
+                    <button class="fb-action-btn" onclick="sharePost({{ $ad->id }})">
+                        <i class="fas fa-share"></i> Partager
+                    </button>
+                    @if($canReplyToAd)
+                        <button class="fb-action-btn contact-btn" onclick="window.location.href='{{ route('ads.show', $ad->id) }}'">
+                            <i class="fas fa-envelope"></i> Contacter
+                        </button>
+                    @else
+                        <button class="fb-action-btn contact-btn" style="opacity: 0.45; cursor: not-allowed;" title="{{ $replyRestrictionMsg }}" onclick="alert('{{ $replyRestrictionMsg }}. Rendez-vous sur la page de l\'annonce pour plus de détails.')">
+                            <i class="fas fa-lock" style="font-size: 0.75rem;"></i> Contacter
+                        </button>
+                    @endif
+                </div>
+
+                {{-- Inline comments section --}}
+                <div class="fb-post-comments" id="comments-section-{{ $ad->id }}" style="display: none;">
+                    <div class="fb-comments-list" id="comments-list-{{ $ad->id }}">
+                        <div class="no-comments-msg" id="no-comments-{{ $ad->id }}">
+                            <i class="far fa-comment-dots"></i> Soyez le premier à commenter
+                        </div>
+                    </div>
+                    @auth
+                    @if($canReplyToAd)
+                    <form class="fb-comment-form" onsubmit="submitComment(event, {{ $ad->id }})">
+                        <div class="fb-comment-avatar">
+                            @if(Auth::user()->avatar)
+                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                            @else
+                                <div class="fb-post-avatar-placeholder" style="width:32px;height:32px;font-size:0.8rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                            @endif
+                        </div>
+                        <div class="fb-comment-input-wrap">
+                            <input type="text" id="comment-input-{{ $ad->id }}" placeholder="Écrire un commentaire..." autocomplete="off">
+                            <button type="submit" class="fb-comment-send-btn" id="comment-submit-{{ $ad->id }}">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    @else
+                    {{-- User can't reply due to restriction --}}
+                    <div style="text-align:center; padding: 10px; font-size: 0.82rem; color: #92400e; background: #fef3c7; border-radius: 6px; margin: 8px 12px;">
+                        <i class="fas fa-lock me-1"></i> {{ $replyRestrictionMsg }}
+                        @if($adRestriction === 'pro_only')
+                            — <a href="{{ route('pro.dashboard') }}" style="color: #d97706; font-weight: 600; text-decoration: none;">Devenir Pro</a>
+                        @elseif($adRestriction === 'verified_only')
+                            — <a href="{{ route('verification.index') }}" style="color: #059669; font-weight: 600; text-decoration: none;">Vérifier mon profil</a>
+                        @endif
+                    </div>
+                    @endif
+                    @else
+                    <div style="text-align:center; padding: 8px; font-size: 0.85rem; color: #65676b;">
+                        <a href="{{ route('login') }}" style="color: #1877f2; text-decoration: none; font-weight: 600;">Connectez-vous</a> pour commenter
+                    </div>
+                    @endauth
+                </div>
+            </div>
+
+            @empty
+            <div style="text-align: center; padding: 60px 20px; color: #65676b;">
+                <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #bec3c9; margin-bottom: 12px;"></i>
+                <h3 style="font-weight: 600; color: #050505;">Aucune publication</h3>
+                <p>Soyez le premier à publier une offre !</p>
+                <a href="{{ route('ads.create') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Publier une offre
+                </a>
+            </div>
+            @endforelse
+            </div>
+
+            @if($ads->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $ads->links() }}
+            </div>
+            @endif
+
+            @php
+                $showcasePros = $featuredProfessionals ?? ($premiumPros ?? collect());
+            @endphp
+
+            <div class="mt-5">
+                <div class="text-center mb-3">
+                        <h2 class="fw-bold mb-1" style="font-size: 1.35rem; color: var(--text-dark);">
+                            <i class="fas fa-user-shield" style="color: var(--primary); margin-right: 6px;"></i>
+                            Profils professionnels à la une
+                        </h2>
+                        <p class="text-muted mb-0" style="font-size: 0.92rem;">Sélectionnés selon la qualité des avis clients et la fiabilité du profil</p>
+                </div>
+
+                <div class="providers-grid" id="featuredProfessionalsGrid">
+                    @if(isset($showcasePros) && $showcasePros->count() > 0)
+                        @foreach($showcasePros as $pro)
+                        <a href="{{ route('profile.public', $pro->id) }}" class="provider-card">
+                            <div class="provider-image-wrapper">
+                                @if($pro->avatar)
+                                    <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}">
+                                @else
+                                    <div class="provider-image-placeholder">
+                                        {{ strtoupper(substr($pro->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                @if($pro->profession)
+                                <div class="provider-badge-top"><i class="fas fa-briefcase"></i> {{ Str::limit($pro->profession, 25) }}</div>
+                                @elseif($pro->service_category)
+                                <div class="provider-badge-top"><i class="fas fa-briefcase"></i> {{ Str::limit($pro->service_category, 25) }}</div>
+                                @endif
+                            </div>
+                            <div class="provider-card-info">
+                                <div class="provider-info-header">
+                                    <h3 class="provider-name">
+                                        {{ Str::limit($pro->name, 18) }}
+                                        @if($pro->user_type === 'professionnel' || $pro->hasActiveProSubscription() || $pro->hasCompletedProOnboarding())
+                                        <span class="badge-pro">PRO</span>
+                                        @endif
+                                    </h3>
+                                    @if($pro->hourly_rate)
+                                    <span class="provider-price">{{ number_format((float)$pro->hourly_rate, 0, ',', ' ') }} €/h</span>
+                                    @endif
+                                </div>
+                                <div class="provider-rating">
+                                    <span class="star-icon">★</span>
+                                    <span class="rating-value">{{ isset($pro->verified_reviews_avg) ? number_format((float)$pro->verified_reviews_avg, 1, ',', '') : 'Nouveau' }}</span>
+                                    <span class="reviews-count">({{ $pro->verified_reviews_count ?? 0 }} avis)</span>
+                                </div>
+                                @if($pro->bio)
+                                <p class="provider-category">{{ Str::limit($pro->bio, 55) }}</p>
+                                @endif
+                            </div>
+                        </a>
+                        @endforeach
+                    @else
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-users"></i>
+                            <h3>Aucun professionnel disponible</h3>
+                            <p>Les profils recommandés apparaîtront ici automatiquement.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER - Mentions légales -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="row">
+            <!-- À propos -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <span class="logo-icon">P</span>
+                        <span class="logo-text">ProxiPro</span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de mise en relation entre particuliers et professionnels. 
+                        Trouvez des prestataires qualifiés ou proposez vos services.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liens utiles -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5 class="footer-title">Liens utiles</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ route('feed') }}">Accueil</a></li>
+                    <li><a href="{{ route('ads.create') }}">Publier une annonce</a></li>
+                    <li><a href="{{ route('pricing.index') }}">Tarifs</a></li>
+                    <li><a href="{{ route('contact.index') }}">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Informations légales -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="footer-title">Informations légales</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ route('legal.terms') }}">Conditions d'utilisation</a></li>
+                    <li><a href="{{ route('legal.privacy') }}">Politique de confidentialité</a></li>
+                    <li><a href="{{ route('legal.cookies') }}">Politique des cookies</a></li>
+                    <li><a href="{{ route('legal.mentions') }}">Mentions légales</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-6 mb-4">
+                <h5 class="footer-title">Contact</h5>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-envelope"></i> contact@ProxiPro.com</li>
+                    <li><i class="fas fa-phone"></i> +262 693 00 00 00</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Mayotte, France</li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="footer-divider">
+        
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="copyright">© {{ date('Y') }} ProxiPro. Tous droits réservés.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="footer-credits">Fait avec <i class="fas fa-heart text-danger"></i> à Mayotte</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+/* =========================================
+   FOOTER - Style moderne
+   ========================================= */
+.site-footer {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #94a3b8;
+    padding: 60px 0 0;
+    margin-top: 60px;
+}
+
+.footer-brand {
+    margin-bottom: 20px;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.footer-logo .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.footer-logo .logo-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+}
+
+.footer-description {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+}
+
+.social-link {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.footer-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 30px;
+    height: 2px;
+    background: var(--primary);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.footer-links a:hover {
+    color: white;
+    padding-left: 5px;
+}
+
+.footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-contact li {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-contact i {
+    color: var(--primary);
+    width: 16px;
+}
+
+.footer-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 30px 0 20px;
+}
+
+.footer-bottom {
+    padding-bottom: 30px;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.footer-credits {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 40px 0 0;
+        text-align: center;
+    }
+    
+    .footer-logo {
+        justify-content: center;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+    
+    .footer-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-bottom .row > div {
+        text-align: center !important;
+    }
+}
+</style>
+
+<!-- LIGHTBOX POUR PHOTOS -->
+<div id="photoLightbox" class="photo-lightbox" onclick="closePhotoLightbox(event)">
+    <button class="photo-lightbox-close" onclick="closePhotoLightbox(event)">
+        <i class="fas fa-times"></i>
+    </button>
+    <img id="lightboxImage" src="" alt="Photo">
+    <div id="lightboxTitle" class="photo-lightbox-title"></div>
+</div>
+
+<!-- POPUP DÉTAIL PUBLICATION -->
+<div class="ad-detail-overlay" id="adDetailOverlay" onclick="if(event.target===this) closeAdDetail()">
+    <div class="ad-detail-popup" id="adDetailPopup">
+        <button class="ad-detail-close" onclick="closeAdDetail()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Photos -->
+        <div class="ad-detail-photos" id="adDetailPhotos"></div>
+
+        <!-- Contenu -->
+        <div class="ad-detail-content">
+            <div class="ad-detail-user" id="adDetailUser"></div>
+            <h2 class="ad-detail-title" id="adDetailTitle"></h2>
+            <div class="ad-detail-badges" id="adDetailBadges"></div>
+            <div class="ad-detail-price" id="adDetailPrice"></div>
+            <div class="ad-detail-description" id="adDetailDescription"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="ad-detail-actions" id="adDetailActions"></div>
+
+        <!-- Commentaires -->
+        <div class="ad-detail-comments">
+            <h5><i class="far fa-comments"></i> <span id="adDetailCommentsTitle">Commentaires</span></h5>
+            <div class="comments-list-inline" id="adDetailCommentsList">
+                <div class="no-comments-inline">
+                    <i class="far fa-comment-dots"></i>
+                    Aucun commentaire. Soyez le premier à commenter !
+                </div>
+            </div>
+            @auth
+            <div class="comment-form-inline">
+                <div class="comment-input-wrapper">
+                    <input type="text" class="comment-input-inline" id="adDetailCommentInput" 
+                           placeholder="Écrivez un commentaire..." 
+                           onkeypress="if(event.key === 'Enter') submitPopupComment()">
+                    <button class="comment-submit-btn" onclick="submitPopupComment()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            @else
+            <div class="login-to-comment">
+                <a href="{{ route('login') }}">Connectez-vous</a> pour commenter
+            </div>
+            @endauth
+        </div>
+    </div>
+</div>
+
+{{-- Modal d'onboarding professionnel --}}
+@include('partials.pro-onboarding-modal')
+
+@endsection
+
+@push('scripts')
+<script>
+    console.log('=== Script ProxiPro Feed chargé ===');
+    
+    // =========================================
+    // SYSTÈME DE PUBLICATION SOCIALE AMÉLIORÉ
+    // =========================================
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const likedAds = new Set();
+
+    // =========================================
+    // GESTION DU LIGHTBOX PHOTO
+    // =========================================
+    function openPhotoLightbox(photoUrl, title) {
+        const lightbox = document.getElementById('photoLightbox');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        
+        if (lightbox && lightboxImage) {
+            lightboxImage.src = photoUrl;
+            lightboxTitle.textContent = title || '';
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closePhotoLightbox(event) {
+        // Ne pas fermer si on clique sur l'image elle-même
+        if (event && event.target && event.target.tagName === 'IMG') {
+            return;
+        }
+        
+        const lightbox = document.getElementById('photoLightbox');
+        if (lightbox) {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+    
+    // Fermer avec la touche Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePhotoLightbox({});
+        }
+    });
+
+    // =========================================
+    // URGENT CAROUSEL SCROLL
+    // =========================================
+    function scrollUrgentCarousel(direction) {
+        const track = document.getElementById('urgentCarouselTrack');
+        if (!track) return;
+        const scrollAmount = 240; // card width + gap
+        track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+
+    // =========================================
+    // GESTION DES LIKES
+    // =========================================
+    function toggleLike(adId, btnEl) {
+        if (event) event.stopPropagation();
+        const isLiked = likedAds.has(adId);
+        const likesCountEl = document.querySelector(`.likes-count-${adId}`);
+        
+        if (isLiked) {
+            likedAds.delete(adId);
+            if (btnEl) { btnEl.classList.remove('liked'); btnEl.innerHTML = '<i class="far fa-thumbs-up"></i> J\'aime'; }
+            if (likesCountEl) { const c = parseInt(likesCountEl.textContent)||0; likesCountEl.textContent = Math.max(0, c-1); }
+        } else {
+            likedAds.add(adId);
+            if (btnEl) { btnEl.classList.add('liked'); btnEl.innerHTML = '<i class="fas fa-thumbs-up"></i> J\'aime'; }
+            if (likesCountEl) { const c = parseInt(likesCountEl.textContent)||0; likesCountEl.textContent = c+1; }
+        }
+        
+        fetch(`/ads/${adId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+        }).catch(err => console.error('Erreur like:', err));
+    }
+
+    function sharePost(adId) {
+        if (event) event.stopPropagation();
+        const url = `${window.location.origin}/ads/${adId}`;
+        if (navigator.share) {
+            navigator.share({ title: 'Publication Massiwani', url: url }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Lien copié !', 'success');
+            }).catch(() => {
+                showToast('Impossible de copier le lien', 'error');
+            });
+        }
+    }
+    
+    function saveAd(adId) {
+        // Appel AJAX pour sauvegarder
+        fetch(`/saved-ads/${adId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            showToast('Annonce sauvegardée !', 'success');
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Annonce sauvegardée !', 'success');
+        });
+    }
+
+    // =========================================
+    // GESTION DU PARTAGE
+    // =========================================
+    function toggleShareMenu(adId, btn) {
+        console.log('toggleShareMenu appelé pour:', adId);
+        event.stopPropagation();
+        const menu = document.getElementById(`share-menu-${adId}`);
+        console.log('Menu trouvé:', menu);
+        if (!menu) {
+            console.error('Menu non trouvé:', `share-menu-${adId}`);
+            return;
+        }
+        const isOpen = menu.classList.contains('open');
+        console.log('Menu est ouvert:', isOpen);
+        
+        // Fermer tous les menus
+        document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
+        
+        if (!isOpen) {
+            menu.classList.add('open');
+            console.log('Menu maintenant ouvert');
+        }
+    }
+    
+    // Fermer le menu de partage en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.share-wrapper')) {
+            document.querySelectorAll('.share-menu.open').forEach(m => m.classList.remove('open'));
+        }
+    });
+
+    function copyLink(adId) {
+        const url = `${window.location.origin}/ads/${adId}`;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(() => {
+                showShareFeedback(adId, 'copy');
+                showToast('Lien copié dans le presse-papiers !', 'success');
+                incrementShareCount(adId);
+            });
+        } else {
+            fallbackCopyToClipboard(url);
+            incrementShareCount(adId);
+        }
+        
+        document.getElementById(`share-menu-${adId}`).classList.remove('open');
+    }
+
+    function fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast('Lien copié dans le presse-papiers !', 'success');
+        } catch (err) {
+            showToast('Impossible de copier le lien', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function shareTo(platform, adId, title = '') {
+        const url = `${window.location.origin}/ads/${adId}`;
+        const shareTitle = title || 'Découvrez cette offre sur ProxiPro';
+        let shareUrl = '';
+        
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareTitle)}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://wa.me/?text=${encodeURIComponent(shareTitle + ' ' + url)}`;
+                break;
+        }
+        
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+            showToast(`Partagé sur ${platform.charAt(0).toUpperCase() + platform.slice(1)} !`, 'success');
+            incrementShareCount(adId);
+        }
+        
+        // Fermer le menu
+        document.getElementById(`share-menu-${adId}`).classList.remove('open');
+    }
+    
+    // Incrémenter le compteur de partages
+    function incrementShareCount(adId) {
+        fetch(`/api/ads/${adId}/share`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mettre à jour le compteur dans l'interface
+                const shareCountEl = document.querySelector(`.shares-count-${adId}`);
+                if (shareCountEl) {
+                    shareCountEl.textContent = data.shares_count;
+                }
+            }
+        })
+        .catch(error => console.log('Erreur partage:', error));
+    }
+
+    function showShareFeedback(adId, type) {
+        const menu = document.getElementById(`share-menu-${adId}`);
+        const option = menu.querySelector(`.share-option.${type}`);
+        if (option) {
+            option.classList.add('copied');
+            const originalText = option.querySelector('span').textContent;
+            option.querySelector('span').textContent = 'Copié !';
+            setTimeout(() => {
+                option.classList.remove('copied');
+                option.querySelector('span').textContent = originalText;
+            }, 1500);
+        }
+    }
+
+    // =========================================
+    // GESTION DES COMMENTAIRES
+    // =========================================
+    const loadedComments = new Set(); // Pour éviter de recharger les commentaires déjà chargés
+    
+    function toggleComments(adId) {
+        if (event) event.stopPropagation();
+        
+        const section = document.getElementById(`comments-section-${adId}`);
+        if (!section) return;
+        
+        const isVisible = section.style.display !== 'none';
+        
+        if (isVisible) {
+            section.style.display = 'none';
+        } else {
+            section.style.display = 'block';
+            
+            // Charger les commentaires si pas déjà fait
+            if (!loadedComments.has(adId)) {
+                loadComments(adId);
+            }
+            
+            // Focus sur l'input
+            setTimeout(() => {
+                const input = document.getElementById(`comment-input-${adId}`);
+                if (input) input.focus();
+            }, 100);
+        }
+    }
+    
+    async function loadComments(adId) {
+        const commentsList = document.getElementById(`comments-list-${adId}`);
+        if (!commentsList) return;
+        
+        try {
+            const response = await fetch(`/ads/${adId}/comments`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) return;
+            
+            const data = await response.json();
+            
+            // Mettre à jour le compteur avec le nombre total de commentaires
+            if (data.total !== undefined) {
+                const countElements = document.querySelectorAll(`.comments-count-${adId}`);
+                countElements.forEach(el => {
+                    el.textContent = data.total;
+                });
+            }
+            
+            if (data.success && data.comments && data.comments.length > 0) {
+                // Masquer le message "aucun commentaire"
+                const noComments = document.getElementById(`no-comments-${adId}`);
+                if (noComments) noComments.style.display = 'none';
+                
+                // Afficher les commentaires
+                let html = '';
+                data.comments.forEach(comment => {
+                    const avatarHtml = comment.user.avatar 
+                        ? `<img src="${comment.user.avatar}" alt="${comment.user.name}">`
+                        : `<div class="comment-avatar-placeholder-inline">${comment.user.initial}</div>`;
+                    
+                    const deleteBtn = comment.user.id == {{ Auth::id() ?? 'null' }} 
+                        ? `<button class="comment-action-btn" onclick="deleteComment(${comment.id}, ${adId})"><i class="fas fa-trash-alt"></i> Supprimer</button>`
+                        : '';
+                    
+                    html += `
+                        <div class="comment-item-inline" data-comment-id="${comment.id}">
+                            <div class="comment-avatar-inline">${avatarHtml}</div>
+                            <div class="comment-content-inline">
+                                <div class="comment-bubble">
+                                    <a href="/profile/${comment.user.id}" class="comment-author-inline">${comment.user.name}</a>
+                                    <p class="comment-text-inline">${escapeHtml(comment.content)}</p>
+                                </div>
+                                <div class="comment-actions-inline">
+                                    <button class="comment-action-btn" onclick="likeComment(${comment.id})">
+                                        <i class="far fa-heart"></i> J'aime
+                                    </button>
+                                    <span class="comment-time-inline">${comment.created_at}</span>
+                                    ${deleteBtn}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                commentsList.innerHTML = html;
+                loadedComments.add(adId);
+            }
+        } catch (error) {
+            console.error('Erreur chargement commentaires:', error);
+        }
+    }
+
+    async function submitComment(event, adId) {
+        event.preventDefault();
+        
+        const input = document.getElementById(`comment-input-${adId}`);
+        const submitBtn = document.getElementById(`comment-submit-${adId}`);
+        const content = input.value.trim();
+        
+        if (!content) return;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            const response = await fetch(`/ads/${adId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ content: content })
+            });
+            
+            // Vérifier si la réponse est OK
+            if (!response.ok) {
+                if (response.status === 401) {
+                    showToast('Vous devez être connecté pour commenter', 'error');
+                    return;
+                }
+                if (response.status === 403) {
+                    try {
+                        const errData = await response.json();
+                        showToast(errData.message || 'Vous n\'êtes pas autorisé à commenter cette annonce', 'error');
+                    } catch(e) {
+                        showToast('Vous n\'êtes pas autorisé à commenter cette annonce', 'error');
+                    }
+                    return;
+                }
+                if (response.status === 419) {
+                    showToast('Session expirée, veuillez rafraîchir la page', 'error');
+                    return;
+                }
+                const errorText = await response.text();
+                console.error('Erreur serveur:', response.status, errorText);
+                showToast('Erreur lors de l\'ajout du commentaire', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const noComments = document.getElementById(`no-comments-${adId}`);
+                if (noComments) noComments.style.display = 'none';
+                
+                const commentsList = document.getElementById(`comments-list-${adId}`);
+                const comment = data.comment;
+                
+                const avatarHtml = comment.user.avatar 
+                    ? `<img src="${comment.user.avatar}" alt="${comment.user.name}">`
+                    : `<div class="comment-avatar-placeholder-inline">${comment.user.initial}</div>`;
+                
+                const commentHtml = `
+                    <div class="comment-item-inline new-comment" data-comment-id="${comment.id}">
+                        <div class="comment-avatar-inline">${avatarHtml}</div>
+                        <div class="comment-content-inline">
+                            <div class="comment-bubble">
+                                <a href="/profile/${comment.user.id}" class="comment-author-inline">${comment.user.name}</a>
+                                <p class="comment-text-inline">${escapeHtml(comment.content)}</p>
+                            </div>
+                            <div class="comment-actions-inline">
+                                <button class="comment-action-btn" onclick="likeComment(${comment.id})">
+                                    <i class="far fa-heart"></i> J'aime
+                                </button>
+                                <span class="comment-time-inline">À l'instant</span>
+                                <button class="comment-action-btn" onclick="deleteComment(${comment.id}, ${adId})">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                commentsList.insertAdjacentHTML('afterbegin', commentHtml);
+                updateCommentCount(adId, 1);
+                input.value = '';
+                
+                showToast('Commentaire ajouté !', 'success');
+            } else {
+                showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showToast('Une erreur est survenue', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        }
+    }
+
+    async function deleteComment(commentId, adId) {
+        if (!confirm('Supprimer ce commentaire ?')) return;
+        
+        try {
+            const response = await fetch(`/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Erreur serveur:', response.status, errorText);
+                showToast('Erreur lors de la suppression', 'error');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const commentEl = document.querySelector(`.comment-item-inline[data-comment-id="${commentId}"]`);
+                if (commentEl) {
+                    commentEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    commentEl.style.opacity = '0';
+                    commentEl.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        commentEl.remove();
+                        updateCommentCount(adId, -1);
+                        
+                        const commentsList = document.getElementById(`comments-list-${adId}`);
+                        if (commentsList && commentsList.querySelectorAll('.comment-item-inline').length === 0) {
+                            commentsList.innerHTML = `
+                                <div class="no-comments-inline" id="no-comments-${adId}">
+                                    <i class="far fa-comment-dots"></i>
+                                    Aucun commentaire. Soyez le premier à commenter !
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                }
+                
+                showToast('Commentaire supprimé', 'success');
+            } else {
+                showToast(data.message || 'Erreur lors de la suppression', 'error');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showToast('Erreur lors de la suppression', 'error');
+        }
+    }
+
+    function likeComment(commentId) {
+        const btn = event.target.closest('.comment-action-btn');
+        btn.classList.toggle('liked');
+        
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('liked')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btn.style.color = '#dc2626';
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btn.style.color = '';
+        }
+        
+        // Appel AJAX
+        fetch(`/comments/${commentId}/like`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        }).catch(err => console.error('Erreur like commentaire:', err));
+    }
+
+    function updateCommentCount(adId, delta) {
+        const countElements = document.querySelectorAll(`.comments-count-${adId}`);
+        countElements.forEach(el => {
+            const current = parseInt(el.textContent) || 0;
+            el.textContent = Math.max(0, current + delta);
+        });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // =========================================
+    // SYSTÈME DE TOAST NOTIFICATIONS AMÉLIORÉ
+    // =========================================
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer') || createToastContainer();
+        const toastId = 'toast-' + Date.now();
+        
+        const icons = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            info: 'info-circle'
+        };
+        
+        const titles = {
+            success: 'Succès',
+            error: 'Erreur',
+            info: 'Information'
+        };
+        
+        const toastHtml = `
+            <div id="${toastId}" class="toast-custom ${type}">
+                <div class="toast-icon">
+                    <i class="fas fa-${icons[type]}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type]}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.closest('.toast-custom').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        const toast = document.getElementById(toastId);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+    
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    // Fonction pour signaler une publication
+    function submitReport(adId, reason) {
+        fetch('/ads/' + adId + '/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ reason: reason })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Fermer le modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('reportModal' + adId));
+            if (modal) modal.hide();
+            
+            // Afficher un message de confirmation
+            alert('Merci pour votre signalement. Notre équipe va examiner cette publication.');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue. Veuillez réessayer.');
+        });
+    }
+
+    // État actuel des filtres
+    let currentFilters = {
+        mode: 'missions', // 'missions' ou 'providers'
+        category: '',
+        subcategory: '',
+        sort: 'recommended',
+        country: '',
+        city: '',
+        priceMin: null,
+        priceMax: null,
+        lat: {{ $userLat ?? 'null' }},
+        lng: {{ $userLng ?? 'null' }},
+        radius: {{ $userRadius ?? 50 }},
+        geoEnabled: {{ ($geoEnabled ?? false) ? 'true' : 'false' }}
+    };
+
+    // Données des catégories
+    const categoriesData = @json($missionCategories);
+
+    /**
+     * Toggle dropdown menu
+     */
+    function toggleDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        const isOpen = dropdown.classList.contains('open');
+        
+        // Fermer tous les autres dropdowns
+        document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+        
+        if (!isOpen) {
+            dropdown.classList.add('open');
+        }
+    }
+
+    // Fermer dropdowns en cliquant ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter-dropdown')) {
+            document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+        }
+    });
+
+    /**
+     * Changer le mode de vue (prestataires / missions)
+     */
+    function setViewMode(mode) {
+        currentFilters.mode = mode;
+        
+        // Mettre à jour les boutons toggle
+        document.getElementById('togglePro').classList.toggle('active', mode === 'providers');
+        document.getElementById('toggleMission').classList.toggle('active', mode === 'missions');
+        
+        // Afficher/Masquer les sections
+        document.getElementById('providersSection').style.display = mode === 'providers' ? 'block' : 'none';
+        document.getElementById('missionsSection').style.display = mode === 'missions' ? 'block' : 'none';
+        
+        // Recharger les données
+        loadData();
+    }
+
+    /**
+     * Sélectionner une catégorie
+     */
+    function selectCategory(category) {
+        currentFilters.category = category;
+        currentFilters.subcategory = '';
+        
+        // Mettre à jour le label
+        const label = document.getElementById('categoryLabel');
+        label.textContent = category || 'Catégorie';
+        
+        // Mettre à jour les items sélectionnés
+        document.querySelectorAll('#categoryMenu .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === category);
+        });
+        
+        // Afficher le dropdown des sous-catégories si une catégorie est sélectionnée
+        const subcatDropdown = document.getElementById('subcategoryDropdown');
+        if (category && categoriesData[category] && categoriesData[category].subs) {
+            subcatDropdown.style.display = 'block';
+            populateSubcategories(categoriesData[category].subs);
+        } else {
+            subcatDropdown.style.display = 'none';
+        }
+        
+        // Fermer le dropdown
+        document.getElementById('categoryDropdown').classList.remove('open');
+        
+        // Recharger les données
+        loadData();
+    }
+
+    /**
+     * Remplir les sous-catégories
+     */
+    function populateSubcategories(subs) {
+        const menu = document.getElementById('subcategoryMenu');
+        let html = '<div class="filter-menu-item selected" data-value="" onclick="selectSubcategory(\'\')"><i class="fas fa-check"></i> Toutes</div>';
+        
+        subs.forEach(sub => {
+            html += `<div class="filter-menu-item" data-value="${sub.name}" onclick="selectSubcategory('${sub.name}')">
+                <i class="${sub.icon || 'fas fa-tag'}"></i> ${sub.name}
+                <span class="ms-auto text-muted small">${sub.count || 0}</span>
+            </div>`;
+        });
+        
+        menu.innerHTML = html;
+        document.getElementById('subcategoryLabel').textContent = 'Sous-catégorie';
+    }
+
+    /**
+     * Sélectionner une sous-catégorie
+     */
+    function selectSubcategory(subcategory) {
+        currentFilters.subcategory = subcategory;
+        
+        document.getElementById('subcategoryLabel').textContent = subcategory || 'Sous-catégorie';
+        
+        document.querySelectorAll('#subcategoryMenu .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === subcategory);
+        });
+        
+        document.getElementById('subcategoryDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Sélectionner le tri
+     */
+    function selectSort(sort) {
+        currentFilters.sort = sort;
+        
+        const labels = {
+            'recommended': 'Recommandé',
+            'recent': 'Plus récent',
+            'urgent': 'Urgent'
+        };
+        
+        document.getElementById('sortLabel').textContent = labels[sort] || 'Trier';
+        
+        document.querySelectorAll('#sortDropdown .filter-menu-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.value === sort);
+        });
+        
+        document.getElementById('sortDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Définir la tranche de prix
+     */
+    function setPriceRange(min, max) {
+        document.getElementById('priceMin').value = min || '';
+        document.getElementById('priceMax').value = max || '';
+    }
+
+    /**
+     * Réinitialiser le filtre de prix
+     */
+    function resetPriceFilter() {
+        document.getElementById('priceMin').value = '';
+        document.getElementById('priceMax').value = '';
+        currentFilters.priceMin = null;
+        currentFilters.priceMax = null;
+        document.getElementById('priceLabel').textContent = 'Prix';
+        document.getElementById('priceDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Appliquer le filtre de prix
+     */
+    function applyPriceFilter() {
+        currentFilters.priceMin = document.getElementById('priceMin').value || null;
+        currentFilters.priceMax = document.getElementById('priceMax').value || null;
+        
+        let label = 'Prix';
+        if (currentFilters.priceMin && currentFilters.priceMax) {
+            label = `${currentFilters.priceMin}€ - ${currentFilters.priceMax}€`;
+        } else if (currentFilters.priceMin) {
+            label = `${currentFilters.priceMin}€+`;
+        } else if (currentFilters.priceMax) {
+            label = `0 - ${currentFilters.priceMax}€`;
+        }
+        
+        document.getElementById('priceLabel').textContent = label;
+        document.getElementById('priceDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Suggestions villes / codes postaux selon le pays sélectionné
+     */
+    function getSelectedCountryCode() {
+        const select = document.getElementById('countrySelect');
+        if (!select) return '';
+        const option = select.options[select.selectedIndex];
+        return option?.dataset?.code || '';
+    }
+
+    function resetCitySuggestions() {
+        const list = document.getElementById('citySuggestions');
+        if (list) list.innerHTML = '';
+    }
+
+    function buildLocationLabel(item) {
+        const address = item.address || {};
+        const city = address.city || address.town || address.village || address.municipality || address.county || '';
+        const postcode = address.postcode || '';
+        if (city && postcode) return `${city} ${postcode}`;
+        if (city) return city;
+        if (postcode) return postcode;
+        return item.display_name || '';
+    }
+
+    const debouncedCitySearch = (() => {
+        let timeoutId;
+        return (query) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fetchCitySuggestions(query), 350);
+        };
+    })();
+
+    function fetchCitySuggestions(query) {
+        const code = getSelectedCountryCode();
+        const list = document.getElementById('citySuggestions');
+        if (!list) return;
+
+        if (!code || !query || query.length < 2) {
+            list.innerHTML = '';
+            return;
+        }
+
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=10&countrycodes=${code}&q=${encodeURIComponent(query)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(results => {
+                const labels = new Set();
+                results.forEach(item => {
+                    const label = buildLocationLabel(item);
+                    if (label) labels.add(label);
+                });
+
+                list.innerHTML = Array.from(labels)
+                    .map(label => `<option value="${label}"></option>`)
+                    .join('');
+            })
+            .catch(() => {
+                list.innerHTML = '';
+            });
+    }
+
+    // ===== CITIES DATA BY COUNTRY FOR FILTER =====
+    const filterCitiesByCountry = {
+        "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier", "Bordeaux", "Lille", "Rennes", "Reims", "Le Havre", "Saint-Étienne", "Toulon", "Grenoble", "Dijon", "Angers", "Nîmes", "Villeurbanne", "Clermont-Ferrand", "Le Mans", "Aix-en-Provence", "Brest", "Tours", "Amiens", "Limoges", "Perpignan", "Metz", "Besançon", "Orléans", "Rouen", "Mulhouse", "Caen", "Nancy"],
+        "Mayotte": ["Mamoudzou", "Koungou", "Dzaoudzi", "Dembeni", "Bandraboua", "Tsingoni", "Sada", "Ouangani", "Chiconi", "Pamandzi", "Mtsamboro", "Acoua", "Chirongui", "Bouéni", "Kani-Kéli", "Bandrélé", "M'Tsangamouji"],
+        "Madagascar": ["Antananarivo", "Toamasina", "Antsirabe", "Fianarantsoa", "Mahajanga", "Toliara", "Antsiranana", "Ambatondrazaka", "Antalaha", "Nosy Be", "Sainte-Marie", "Morondava", "Ambositra", "Mananjary", "Sambava"],
+        "La Réunion": ["Saint-Denis", "Saint-Paul", "Saint-Pierre", "Le Tampon", "Saint-André", "Saint-Louis", "Saint-Benoît", "Le Port", "Saint-Joseph", "Sainte-Marie", "Sainte-Suzanne", "Saint-Leu", "La Possession", "Bras-Panon", "Cilaos", "Salazie"],
+        "Maurice": ["Port-Louis", "Beau Bassin-Rose Hill", "Vacoas-Phoenix", "Curepipe", "Quatre Bornes", "Triolet", "Goodlands", "Centre de Flacq", "Mahébourg", "Grand Baie", "Flic en Flac", "Tamarin"],
+        "Belgique": ["Bruxelles", "Anvers", "Gand", "Charleroi", "Liège", "Bruges", "Namur", "Louvain", "Mons", "Alost", "Malines", "La Louvière", "Courtrai", "Ostende", "Hasselt", "Tournai", "Genk", "Seraing", "Verviers", "Mouscron"],
+        "Suisse": ["Zurich", "Genève", "Bâle", "Lausanne", "Berne", "Winterthour", "Lucerne", "Saint-Gall", "Lugano", "Bienne", "Thoune", "Köniz", "Fribourg", "Schaffhouse", "Neuchâtel", "Sion"],
+        "Canada": ["Toronto", "Montréal", "Vancouver", "Calgary", "Edmonton", "Ottawa", "Winnipeg", "Québec", "Hamilton", "Kitchener", "London", "Victoria", "Halifax", "Oshawa", "Windsor", "Saskatoon", "Regina", "Sherbrooke", "Laval", "Gatineau"],
+        "Sénégal": ["Dakar", "Thiès", "Rufisque", "Kaolack", "M'Bour", "Saint-Louis", "Ziguinchor", "Diourbel", "Louga", "Tambacounda", "Kolda", "Richard-Toll", "Tivaouane", "Touba", "Kédougou"],
+        "Côte d'Ivoire": ["Abidjan", "Bouaké", "Yamoussoukro", "Korhogo", "San-Pédro", "Man", "Divo", "Daloa", "Gagnoa", "Abengourou", "Anyama", "Agboville", "Dabou", "Grand-Bassam", "Bingerville"],
+        "Maroc": ["Casablanca", "Rabat", "Fès", "Marrakech", "Tanger", "Agadir", "Meknès", "Oujda", "Kénitra", "Tétouan", "Safi", "El Jadida", "Nador", "Béni Mellal", "Essaouira", "Ouarzazate"],
+        "Tunisie": ["Tunis", "Sfax", "Sousse", "Kairouan", "Bizerte", "Gabès", "Ariana", "Gafsa", "El Mourouj", "Kasserine", "Monastir", "La Marsa", "Hammamet", "Djerba", "Tozeur"],
+        "Algérie": ["Alger", "Oran", "Constantine", "Annaba", "Blida", "Batna", "Sétif", "Djelfa", "Sidi Bel Abbès", "Biskra", "Tébessa", "Skikda", "Tiaret", "Béjaïa", "Tlemcen", "Ouargla"],
+        "Guadeloupe": ["Pointe-à-Pitre", "Les Abymes", "Baie-Mahault", "Le Gosier", "Petit-Bourg", "Sainte-Anne", "Le Moule", "Sainte-Rose", "Capesterre-Belle-Eau", "Basse-Terre"],
+        "Martinique": ["Fort-de-France", "Le Lamentin", "Le Robert", "Schoelcher", "Sainte-Marie", "Le François", "Ducos", "Saint-Joseph", "La Trinité", "Rivière-Pilote"],
+        "Guyane": ["Cayenne", "Saint-Laurent-du-Maroni", "Kourou", "Matoury", "Rémire-Montjoly", "Macouria", "Mana", "Maripasoula", "Apatou", "Iracoubo"]
+    };
+
+    function updateFilterCities() {
+        const countrySelect = document.getElementById('countrySelect');
+        const citySelect = document.getElementById('citySelect');
+        const customCityWrapper = document.getElementById('customCityWrapper');
+        const cityInput = document.getElementById('cityInput');
+        const country = countrySelect.value;
+        
+        citySelect.innerHTML = '<option value="">-- Sélectionner une ville --</option>';
+        customCityWrapper.style.display = 'none';
+        if (cityInput) cityInput.value = '';
+        
+        if (country && filterCitiesByCountry[country]) {
+            citySelect.disabled = false;
+            filterCitiesByCountry[country].forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+            // Add "Autre" option for manual input
+            const otherOption = document.createElement('option');
+            otherOption.value = "__other__";
+            otherOption.textContent = "🔤 Autre ville (saisir manuellement)";
+            citySelect.appendChild(otherOption);
+        } else {
+            citySelect.disabled = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ajuster la position du sidebar en fonction du geo-banner
+        const geoBanner = document.getElementById('geoBanner');
+        const sidebarLeft = document.querySelector('.feed-sidebar-left');
+        const baseTop = 165; // top par défaut sans geo-banner
+
+        function adjustSidebarPosition() {
+            if (sidebarLeft && geoBanner) {
+                const bannerRect = geoBanner.getBoundingClientRect();
+                const bannerBottom = bannerRect.bottom;
+                // Si le banner est encore visible, positionner le sidebar en dessous
+                if (bannerBottom > baseTop) {
+                    sidebarLeft.style.top = bannerBottom + 10 + 'px';
+                    sidebarLeft.style.height = 'calc(100vh - ' + (bannerBottom + 30) + 'px)';
+                } else {
+                    sidebarLeft.style.top = baseTop + 'px';
+                    sidebarLeft.style.height = 'calc(100vh - 185px)';
+                }
+            }
+        }
+
+        adjustSidebarPosition();
+        window.addEventListener('scroll', adjustSidebarPosition, { passive: true });
+        window.addEventListener('resize', adjustSidebarPosition, { passive: true });
+
+        const citySelect = document.getElementById('citySelect');
+        const customCityWrapper = document.getElementById('customCityWrapper');
+        const cityInput = document.getElementById('cityInput');
+
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                if (this.value === "__other__") {
+                    customCityWrapper.style.display = 'block';
+                    cityInput.focus();
+                } else {
+                    customCityWrapper.style.display = 'none';
+                    if (cityInput) cityInput.value = '';
+                }
+            });
+        }
+    });
+
+    /**
+     * Réinitialiser le filtre de localisation
+     */
+    function resetLocationFilter() {
+        document.getElementById('countrySelect').value = '';
+        document.getElementById('citySelect').innerHTML = '<option value="">-- Sélectionner une ville --</option>';
+        document.getElementById('citySelect').disabled = true;
+        document.getElementById('customCityWrapper').style.display = 'none';
+        document.getElementById('cityInput').value = '';
+        currentFilters.country = '';
+        currentFilters.city = '';
+        document.getElementById('locationLabel').textContent = 'Localisation';
+        document.getElementById('locationDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Appliquer le filtre de localisation
+     */
+    function applyLocationFilter() {
+        const countrySelect = document.getElementById('countrySelect');
+        const citySelect = document.getElementById('citySelect');
+        const cityInput = document.getElementById('cityInput');
+        
+        currentFilters.country = countrySelect ? countrySelect.value : '';
+        
+        // Si "Autre" est sélectionné, utiliser le champ de saisie manuelle
+        if (citySelect.value === "__other__") {
+            currentFilters.city = cityInput.value || '';
+        } else {
+            currentFilters.city = citySelect.value || '';
+        }
+        
+        let label = 'Localisation';
+        if (currentFilters.city) {
+            label = currentFilters.city;
+        } else if (currentFilters.country) {
+            label = currentFilters.country;
+        }
+        
+        document.getElementById('locationLabel').textContent = label;
+        document.getElementById('locationDropdown').classList.remove('open');
+        loadData();
+    }
+
+    /**
+     * Charger les données avec les filtres
+     */
+    function loadData() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.classList.add('active');
+        
+        // Construire l'URL avec les filtres
+        let url = currentFilters.mode === 'providers' 
+            ? '{{ route("feed.professionals") }}' 
+            : '{{ route("feed.filter-ads") }}';
+        
+        const params = new URLSearchParams();
+        
+        if (currentFilters.category) params.append('category', currentFilters.category);
+        if (currentFilters.subcategory) params.append('subcategory', currentFilters.subcategory);
+        if (currentFilters.sort) params.append('sort', currentFilters.sort);
+        if (currentFilters.city) {
+            params.append('location', currentFilters.city);
+        } else if (currentFilters.country) {
+            params.append('location', currentFilters.country);
+        }
+        if (currentFilters.priceMin) params.append('price_min', currentFilters.priceMin);
+        if (currentFilters.priceMax) params.append('price_max', currentFilters.priceMax);
+        // Geo params
+        if (currentFilters.geoEnabled && currentFilters.lat && currentFilters.lng) {
+            params.append('lat', currentFilters.lat);
+            params.append('lng', currentFilters.lng);
+            params.append('radius', currentFilters.radius);
+        }
+        params.append('format', 'json');
+        
+        fetch(`${url}?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                overlay.classList.remove('active');
+                
+                if (currentFilters.mode === 'providers') {
+                    renderProviders(data.professionals || data);
+                } else {
+                    renderMissions(data.ads || data);
+                }
+            })
+            .catch(err => {
+                console.error('Erreur chargement:', err);
+                overlay.classList.remove('active');
+            });
+    }
+
+    /**
+     * Rendu des prestataires
+     */
+    function renderProviders(providers) {
+        const grid = document.getElementById('providersGrid');
+        
+        if (!providers || providers.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-users"></i>
+                    <h3>Aucun prestataire trouvé</h3>
+                    <p>Essayez d'autres critères de recherche</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        providers.forEach(pro => {
+            const avatar = pro.avatar 
+                ? `<img src="/storage/${pro.avatar}" alt="${pro.name}">`
+                : `<div class="provider-image-placeholder">${pro.name.charAt(0).toUpperCase()}</div>`;
+            
+            const badge = pro.profession 
+                ? `<div class="provider-badge-top"><i class="fas fa-briefcase"></i> ${pro.profession.substring(0, 25)}</div>` 
+                : (pro.service_category ? `<div class="provider-badge-top"><i class="fas fa-briefcase"></i> ${pro.service_category.substring(0, 25)}</div>` : '');
+            
+            const proBadge = (pro.user_type === 'professionnel' || pro.pro_onboarding_completed || pro.has_active_pro_subscription)
+                ? '<span class="badge-pro">PRO</span>' 
+                : '';
+            
+            const price = pro.hourly_rate 
+                ? `<span class="provider-price">${pro.hourly_rate} €/h</span>` 
+                : '';
+            
+            html += `
+                <a href="/user/${pro.id}" class="provider-card">
+                    <div class="provider-image-wrapper">
+                        ${avatar}
+                        ${badge}
+                    </div>
+                    <div class="provider-card-info">
+                        <div class="provider-info-header">
+                            <h3 class="provider-name">${pro.name.substring(0, 18)} ${proBadge}</h3>
+                            ${price}
+                        </div>
+                        <div class="provider-rating">
+                            <span class="star-icon">★</span>
+                            <span class="rating-value">${(pro.rating || (Math.random() * 0.5 + 4.5)).toFixed(1).replace('.', ',')}</span>
+                            <span class="reviews-count">(${pro.reviews_count || Math.floor(Math.random() * 500 + 50)} avis)</span>
+                        </div>
+                        ${pro.bio ? `<p class="provider-category">${pro.bio.substring(0, 40)}</p>` : ''}
+                    </div>
+                </a>
+            `;
+        });
+        
+        grid.innerHTML = html;
+    }
+
+    /**
+     * Construire l'URL d'une photo
+     */
+    function buildPhotoUrl(photo) {
+        if (!photo) return '';
+        if (photo.startsWith('http://') || photo.startsWith('https://')) return photo;
+        if (photo.startsWith('/storage/')) return photo;
+        if (photo.startsWith('storage/')) return '/' + photo;
+        if (photo.startsWith('public/')) return '/storage/' + photo.replace('public/', '');
+        return '/storage/' + photo.replace(/^\/+/, '');
+    }
+
+    /**
+     * Rendu des publications - Format Facebook
+     */
+    function renderMissions(missions) {
+        const grid = document.getElementById('missionsGrid');
+        
+        if (!missions || missions.length === 0) {
+            grid.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #65676b;">
+                    <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #bec3c9; margin-bottom: 12px;"></i>
+                    <h3 style="font-weight: 600; color: #050505;">Aucune publication trouvée</h3>
+                    <p>Essayez d'autres critères de recherche</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const isAuth = {{ Auth::check() ? 'true' : 'false' }};
+        const authUser = isAuth ? {!! json_encode(['name' => Auth::user()?->name, 'avatar' => Auth::user()?->avatar]) !!} : null;
+        
+        let html = '';
+        missions.forEach(ad => {
+            const userAvatar = ad.user && ad.user.avatar 
+                ? `<img src="/storage/${ad.user.avatar}" alt="${(ad.user.name||'').replace(/"/g,'')}">`
+                : `<div class="fb-post-avatar-placeholder">${(ad.user?.name || 'U').charAt(0).toUpperCase()}</div>`;
+            
+            let photos = [];
+            if (ad.photos) {
+                if (Array.isArray(ad.photos)) photos = ad.photos;
+                else if (typeof ad.photos === 'string') { try { photos = JSON.parse(ad.photos); } catch { photos = [ad.photos]; } }
+            }
+            photos = photos.filter(p => p).map(p => buildPhotoUrl(p));
+            const photoCount = photos.length;
+            
+            let photosHtml = '';
+            if (photoCount === 1) {
+                photosHtml = `<div class="fb-post-photos single" onclick="openAdDetail(this.closest('.fb-post'))"><img src="${photos[0]}" alt="" onerror="this.parentElement.style.display='none';"></div>`;
+            } else if (photoCount >= 2) {
+                const cls = photoCount === 2 ? 'two' : 'three-plus';
+                const show = photos.slice(0, Math.min(photoCount, 4));
+                photosHtml = `<div class="fb-post-photos multi ${cls}" onclick="openAdDetail(this.closest('.fb-post'))">`;
+                show.forEach((url, i) => {
+                    photosHtml += `<div class="fb-photo-item"><img src="${url}" alt="" onerror="this.parentElement.style.display='none';">`;
+                    if (i === 3 && photoCount > 4) photosHtml += `<div class="fb-photo-more-overlay">+${photoCount - 4}</div>`;
+                    photosHtml += `</div>`;
+                });
+                photosHtml += `</div>`;
+            }
+
+            const priceTag = ad.price 
+                ? `<span class="fb-post-tag price"><i class="fas fa-tag"></i> ${new Intl.NumberFormat('fr-FR').format(ad.price)} €</span>` 
+                : `<span class="fb-post-tag"><i class="fas fa-tag"></i> À discuter</span>`;
+            const catTag = ad.category ? `<span class="fb-post-tag"><i class="fas fa-folder"></i> ${ad.category}</span>` : '';
+            const urgentMeta = ad.is_urgent ? `<span>·</span><span style="color:#dc2626;font-weight:600;"><i class="fas fa-bolt"></i> Urgent</span>` : '';
+
+            const safeJson = JSON.stringify(ad).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+            let commentFormHtml = '';
+            if (isAuth) {
+                const authAvatar = authUser.avatar 
+                    ? `<img src="/storage/${authUser.avatar}" alt="">`
+                    : `<div class="fb-post-avatar-placeholder" style="width:32px;height:32px;font-size:0.8rem;">${authUser.name.charAt(0).toUpperCase()}</div>`;
+                commentFormHtml = `
+                    <form class="fb-comment-form" onsubmit="submitComment(event, ${ad.id})">
+                        <div class="fb-comment-avatar">${authAvatar}</div>
+                        <div class="fb-comment-input-wrap">
+                            <input type="text" id="comment-input-${ad.id}" placeholder="Écrire un commentaire..." autocomplete="off">
+                            <button type="submit" class="fb-comment-send-btn" id="comment-submit-${ad.id}"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </form>`;
+            } else {
+                commentFormHtml = `<div style="text-align:center;padding:8px;font-size:0.85rem;color:#65676b;"><a href="/login" style="color:#1877f2;text-decoration:none;font-weight:600;">Connectez-vous</a> pour commenter</div>`;
+            }
+
+            html += `
+                <div class="fb-post" data-ad-id="${ad.id}" data-ad-json="${safeJson}">
+                    <div class="fb-post-header">
+                        <a href="/profile/${ad.user?.id || ''}" class="fb-post-avatar">${userAvatar}</a>
+                        <div class="fb-post-header-info">
+                            <a href="/profile/${ad.user?.id || ''}" class="fb-post-author">
+                                ${ad.user?.name || 'Utilisateur'}
+                                ${ad.user?.is_verified ? '<i class="fas fa-check-circle" style="color: #1877f2; font-size: 0.75rem;"></i>' : ''}
+                            </a>
+                            <div class="fb-post-meta">
+                                <span>${ad.created_at_human || 'Récemment'}</span>
+                                <span>·</span>
+                                <span>${(ad.location || 'France').substring(0, 25)}</span>
+                                ${urgentMeta}
+                            </div>
+                        </div>
+                        <button class="fb-post-options" onclick="event.stopPropagation(); openAdDetail(this.closest('.fb-post'))"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                    <div class="fb-post-body">
+                        <div class="fb-post-title">${ad.title}</div>
+                        <div class="fb-post-text">${(ad.description || '').substring(0, 300)}${(ad.description||'').length > 300 ? '...' : ''}</div>
+                        <div class="fb-post-tags">${priceTag}${catTag}</div>
+                    </div>
+                    ${photosHtml}
+                    <div class="fb-post-reactions-bar">
+                        <div class="reactions-left"><span>👍</span> <span class="likes-count-${ad.id}">0</span></div>
+                        <div class="reactions-right">
+                            <span onclick="toggleComments(${ad.id})"><span class="comments-count-${ad.id}">${ad.comments_count || 0}</span> commentaires</span>
+                            <span>${ad.shares_count || 0} partages</span>
+                        </div>
+                    </div>
+                    <div class="fb-post-actions">
+                        <button class="fb-action-btn" onclick="toggleLike(${ad.id}, this)"><i class="far fa-thumbs-up"></i> J'aime</button>
+                        <button class="fb-action-btn" onclick="toggleComments(${ad.id})"><i class="far fa-comment"></i> Commenter</button>
+                        <button class="fb-action-btn" onclick="sharePost(${ad.id})"><i class="fas fa-share"></i> Partager</button>
+                        <button class="fb-action-btn contact-btn" onclick="window.location.href='/ads/${ad.id}'"><i class="fas fa-envelope"></i> Contacter</button>
+                    </div>
+                    <div class="fb-post-comments" id="comments-section-${ad.id}" style="display: none;">
+                        <div class="fb-comments-list" id="comments-list-${ad.id}">
+                            <div class="no-comments-msg" id="no-comments-${ad.id}"><i class="far fa-comment-dots"></i> Soyez le premier à commenter</div>
+                        </div>
+                        ${commentFormHtml}
+                    </div>
+                </div>
+            `;
+        });
+        
+        grid.innerHTML = html;
+    }
+    
+    // Fonction pour afficher le modal de signalement
+    function showReportModal(adId) {
+        alert("Fonctionnalité de signalement pour l'annonce #" + adId + ". Cette fonctionnalité sera bientôt disponible.");
+    }
+    
+    // Fonction pour masquer une annonce
+    function hideAd(adId) {
+        const card = document.querySelector(`.fb-post[data-ad-id="${adId}"]`);
+        if (card) {
+            card.style.display = 'none';
+        }
+    }
+
+    // =========================================
+    // POPUP DÉTAIL PUBLICATION
+    // =========================================
+    let currentPopupAdId = null;
+
+    function openAdDetail(el) {
+        const overlay = document.getElementById('adDetailOverlay');
+        if (!overlay) return;
+
+        let ad;
+        const jsonAttr = el.getAttribute('data-ad-json');
+        if (jsonAttr) {
+            try {
+                const decoded = jsonAttr.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+                ad = JSON.parse(decoded);
+            } catch(e) {
+                console.error('Erreur parsing JSON ad:', e);
+                return;
+            }
+        } else {
+            return;
+        }
+
+        currentPopupAdId = ad.id;
+
+        // Photos
+        const photosEl = document.getElementById('adDetailPhotos');
+        let photos = [];
+        if (ad.photos) {
+            if (Array.isArray(ad.photos)) photos = ad.photos;
+            else if (typeof ad.photos === 'string') {
+                try { photos = JSON.parse(ad.photos); } catch { photos = [ad.photos]; }
+            }
+        }
+        photos = photos.filter(p => p);
+        if (photos.length > 0) {
+            photosEl.innerHTML = photos.map(p => {
+                const url = buildPhotoUrl(p);
+                return `<img src="${url}" alt="" onclick="openPhotoLightbox('${url}', '${(ad.title||'').replace(/'/g, "\\'")}')"
+                         style="cursor:pointer; max-height:400px; width:100%; object-fit:cover; border-radius:8px; margin-bottom:6px;">`;
+            }).join('');
+            photosEl.style.display = 'block';
+        } else {
+            photosEl.style.display = 'none';
+            photosEl.innerHTML = '';
+        }
+
+        // User
+        const userEl = document.getElementById('adDetailUser');
+        const avatarHtml = ad.user?.avatar
+            ? `<img src="/storage/${ad.user.avatar}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+            : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${(ad.user?.name||'U').charAt(0).toUpperCase()}</div>`;
+        const verifiedIcon = ad.user?.is_verified
+            ? '<i class="fas fa-check-circle" style="color:#10b981;font-size:0.7rem;margin-left:4px;"></i>'
+            : '';
+        userEl.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;">
+                <a href="/user/${ad.user_id}">${avatarHtml}</a>
+                <div>
+                    <a href="/user/${ad.user_id}" class="text-decoration-none" style="font-weight:600;color:#1e293b;">${ad.user?.name||'Utilisateur'}${verifiedIcon}</a>
+                    <div style="font-size:0.8rem;color:#94a3b8;">${ad.created_at_human||'Récemment'} · <i class="fas fa-map-marker-alt me-1"></i>${ad.location||'France'}</div>
+                </div>
+            </div>
+        `;
+
+        // Title
+        document.getElementById('adDetailTitle').textContent = ad.title || '';
+
+        // Badges
+        const badgesEl = document.getElementById('adDetailBadges');
+        let badgesHtml = `<span class="mission-badge mission-badge-category">${ad.category||''}</span>`;
+        if (ad.is_urgent) badgesHtml += '<span class="mission-badge mission-badge-urgent"><i class="fas fa-bolt me-1"></i>Urgent</span>';
+        if (ad.reply_restriction === 'pro_only') badgesHtml += '<span class="mission-badge" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-briefcase me-1"></i>PRO uniquement</span>';
+        if (ad.reply_restriction === 'verified_only') badgesHtml += '<span class="mission-badge" style="background:#d1fae5;color:#059669;"><i class="fas fa-check-circle me-1"></i>Vérifiés uniquement</span>';
+        badgesEl.innerHTML = badgesHtml;
+
+        // Price
+        document.getElementById('adDetailPrice').textContent = ad.price
+            ? new Intl.NumberFormat('fr-FR').format(ad.price) + ' €'
+            : 'Prix à discuter';
+
+        // Description
+        document.getElementById('adDetailDescription').textContent = ad.description || '';
+
+        // Actions
+        const actionsEl = document.getElementById('adDetailActions');
+        actionsEl.innerHTML = `
+            <button class="mission-action-btn" id="popup-like-btn" onclick="event.stopPropagation(); toggleLike(${ad.id})">
+                <i class="far fa-heart"></i> <span>J'aime</span>
+            </button>
+            <div class="share-wrapper">
+                <button class="mission-action-btn" onclick="event.stopPropagation(); toggleShareMenu(${ad.id}, this)">
+                    <i class="fas fa-share"></i> <span>${ad.shares_count||0} Partager</span>
+                </button>
+                <div class="share-menu" id="share-menu-${ad.id}">
+                    <div class="share-menu-header">Partager</div>
+                    <div class="share-option copy" onclick="copyLink(${ad.id})"><i class="fas fa-link"></i><span>Copier le lien</span></div>
+                    <div class="share-option facebook" onclick="shareTo('facebook', ${ad.id})"><i class="fab fa-facebook-f"></i><span>Facebook</span></div>
+                    <div class="share-option whatsapp" onclick="shareTo('whatsapp', ${ad.id}, '${(ad.title||'').replace(/'/g, "\\\'")}')">
+                        <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+                    </div>
+                </div>
+            </div>
+            <a href="/ads/${ad.id}" class="mission-action-btn" style="text-decoration:none;">
+                <i class="fas fa-external-link-alt"></i> <span>Page complète</span>
+            </a>
+        `;
+
+        // Load comments
+        loadPopupComments(ad.id);
+
+        // Show overlay
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAdDetail() {
+        const overlay = document.getElementById('adDetailOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        currentPopupAdId = null;
+    }
+
+    // Fermer avec Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('adDetailOverlay')?.classList.contains('active')) {
+            closeAdDetail();
+        }
+    });
+
+    async function loadPopupComments(adId) {
+        const commentsList = document.getElementById('adDetailCommentsList');
+        const titleEl = document.getElementById('adDetailCommentsTitle');
+        if (!commentsList) return;
+
+        commentsList.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
+
+        try {
+            const response = await fetch(`/ads/${adId}/comments`, { headers: { 'Accept': 'application/json' } });
+            if (!response.ok) return;
+            const data = await response.json();
+
+            if (titleEl) titleEl.textContent = `Commentaires (${data.total || 0})`;
+
+            if (data.success && data.comments && data.comments.length > 0) {
+                let html = '';
+                data.comments.forEach(comment => {
+                    const avatarHtml = comment.user.avatar
+                        ? `<img src="${comment.user.avatar}" alt="${comment.user.name}">`
+                        : `<div class="comment-avatar-placeholder-inline">${comment.user.initial}</div>`;
+                    const deleteBtn = comment.user.id == {{ Auth::id() ?? 'null' }}
+                        ? `<button class="comment-action-btn" onclick="deletePopupComment(${comment.id}, ${adId})"><i class="fas fa-trash-alt"></i></button>`
+                        : '';
+                    html += `
+                        <div class="comment-item-inline" data-comment-id="${comment.id}">
+                            <div class="comment-avatar-inline">${avatarHtml}</div>
+                            <div class="comment-content-inline">
+                                <div class="comment-bubble">
+                                    <a href="/profile/${comment.user.id}" class="comment-author-inline">${comment.user.name}</a>
+                                    <p class="comment-text-inline">${escapeHtml(comment.content)}</p>
+                                </div>
+                                <div class="comment-actions-inline">
+                                    <span class="comment-time-inline">${comment.created_at}</span>
+                                    ${deleteBtn}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                commentsList.innerHTML = html;
+            } else {
+                commentsList.innerHTML = '<div class="no-comments-inline"><i class="far fa-comment-dots"></i> Aucun commentaire. Soyez le premier !</div>';
+            }
+        } catch (error) {
+            console.error('Erreur chargement commentaires popup:', error);
+            commentsList.innerHTML = '<div class="no-comments-inline">Erreur de chargement</div>';
+        }
+    }
+
+    async function submitPopupComment() {
+        if (!currentPopupAdId) return;
+        const input = document.getElementById('adDetailCommentInput');
+        const content = input?.value?.trim();
+        if (!content) return;
+
+        try {
+            const response = await fetch(`/ads/${currentPopupAdId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            });
+            if (!response.ok) {
+                if (response.status === 401) { showToast('Connectez-vous pour commenter', 'error'); return; }
+                showToast('Erreur lors de l\'ajout', 'error'); return;
+            }
+            const data = await response.json();
+            if (data.success) {
+                input.value = '';
+                showToast('Commentaire ajouté !', 'success');
+                loadPopupComments(currentPopupAdId);
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showToast('Erreur', 'error');
+        }
+    }
+
+    async function deletePopupComment(commentId, adId) {
+        if (!confirm('Supprimer ce commentaire ?')) return;
+        try {
+            const response = await fetch(`/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+                showToast('Commentaire supprimé', 'success');
+                loadPopupComments(adId);
+            }
+        } catch (error) { console.error(error); }
+    }
+
+    // Ouvrir popup depuis le sidebar
+    function openSidebarAdDetail(adData) {
+        // Créer un faux élément avec data-ad-json pour réutiliser openAdDetail
+        const fakeEl = document.createElement('div');
+        fakeEl.setAttribute('data-ad-json', JSON.stringify(adData).replace(/"/g, '&quot;').replace(/'/g, '&#39;'));
+        openAdDetail(fakeEl);
+    }
+
+    // =========================================
+    // GEOLOCATION FUNCTIONS
+    // =========================================
+
+    /**
+     * Change le rayon de recherche géo
+     */
+    function changeGeoRadius(radius) {
+        currentFilters.radius = parseInt(radius);
+        
+        // Sauvegarder côté serveur
+        fetch('{{ route("feed.update-radius") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ radius: parseInt(radius) })
+        }).catch(err => console.error('Erreur mise à jour rayon:', err));
+
+        // Recharger les données
+        loadData();
+    }
+
+    /**
+     * Demander la géolocalisation précise du navigateur
+     */
+    function requestBrowserGeolocation() {
+        const btn = document.getElementById('geoPreciseBtn');
+        if (!btn) return;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Détection...';
+        btn.disabled = true;
+
+        if (!navigator.geolocation) {
+            btn.innerHTML = '<i class="fas fa-crosshairs"></i> Préciser';
+            btn.disabled = false;
+            alert('Votre navigateur ne supporte pas la géolocalisation.');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Mettre à jour les filtres locaux
+                currentFilters.lat = lat;
+                currentFilters.lng = lng;
+                currentFilters.geoEnabled = true;
+
+                // Envoyer au serveur
+                fetch('{{ route("feed.store-browser-location") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ latitude: lat, longitude: lng })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    // Mettre à jour le label ville
+                    const cityLabel = document.getElementById('geoCityLabel');
+                    if (cityLabel && data.city) {
+                        cityLabel.textContent = data.city + (data.country ? ', ' + data.country : '');
+                    }
+                    // Mettre à jour le badge source
+                    const badge = document.getElementById('geoSourceBadge');
+                    if (badge) badge.textContent = 'GPS';
+
+                    btn.innerHTML = '<i class="fas fa-check"></i> Localisé';
+                    btn.disabled = false;
+
+                    // Recharger les données avec la nouvelle position
+                    loadData();
+                })
+                .catch(err => {
+                    console.error('Erreur envoi position:', err);
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> Préciser';
+                    btn.disabled = false;
+                    // Recharger quand même avec les coords locales
+                    loadData();
+                });
+            },
+            function(error) {
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> Préciser';
+                btn.disabled = false;
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert('Vous avez refusé la géolocalisation. Activez-la dans les paramètres de votre navigateur.');
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert('Position indisponible. Vérifiez votre connexion.');
+                        break;
+                    default:
+                        alert('Impossible de détecter votre position.');
+                }
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+    }
+
+    /**
+     * Désactiver le filtrage géographique
+     */
+    function disableGeoFiltering() {
+        currentFilters.geoEnabled = false;
+        currentFilters.lat = null;
+        currentFilters.lng = null;
+
+        // Masquer le banner
+        const banner = document.getElementById('geoBanner');
+        if (banner) banner.style.display = 'none';
+
+        // Recharger sans filtre géo
+        loadData();
+    }
+
+    /**
+     * Réactiver le filtrage géographique
+     */
+    function enableGeoFiltering() {
+        currentFilters.geoEnabled = true;
+        currentFilters.lat = {{ $userLat ?? 'null' }};
+        currentFilters.lng = {{ $userLng ?? 'null' }};
+        currentFilters.radius = {{ $userRadius ?? 50 }};
+
+        const banner = document.getElementById('geoBanner');
+        if (banner) banner.style.display = 'flex';
+
+        loadData();
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM chargé, initialisation des boutons...');
+        
+        // La vue par défaut est "missions"
+        setViewMode('missions');
+        
+        // Attacher les événements aux boutons d'action
+        document.querySelectorAll('.mission-action-btn').forEach(btn => {
+            console.log('Bouton trouvé:', btn);
+        });
+        
+        // Test: vérifier si les fonctions existent
+        console.log('toggleLike existe:', typeof toggleLike);
+        console.log('toggleComments existe:', typeof toggleComments);
+        console.log('toggleShareMenu existe:', typeof toggleShareMenu);
+
+        // Auto-demander la géolocalisation navigateur si source IP ou défaut
+        @if(($geoEnabled ?? false) && in_array($geoSource ?? '', ['ip', 'default']))
+        if (navigator.geolocation && !sessionStorage.getItem('geo_asked')) {
+            sessionStorage.setItem('geo_asked', '1');
+            // Demander discrètement en arrière-plan
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    currentFilters.lat = pos.coords.latitude;
+                    currentFilters.lng = pos.coords.longitude;
+                    // Envoyer au serveur silencieusement
+                    fetch('{{ route("feed.store-browser-location") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ latitude: pos.coords.latitude, longitude: pos.coords.longitude })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        const cityLabel = document.getElementById('geoCityLabel');
+                        if (cityLabel && data.city) {
+                            cityLabel.textContent = data.city + (data.country ? ', ' + data.country : '');
+                        }
+                        const badge = document.getElementById('geoSourceBadge');
+                        if (badge) badge.textContent = 'GPS';
+                        loadData();
+                    })
+                    .catch(() => {});
+                },
+                function() { /* silently fail */ },
+                { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
+            );
+        }
+        @endif
+    });
+</script>
+@endpush

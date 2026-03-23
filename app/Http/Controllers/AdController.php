@@ -1,0 +1,408 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Ad;
+use App\Models\User;
+use App\Models\UserService;
+use App\Notifications\NewAdMatchingNotification;
+use App\Services\GeocodingService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
+class AdController extends Controller
+{
+    /**
+     * Display a listing of the resource with advanced search.
+     */
+    public function index(Request $request)
+    {
+        $isMyAds = false;
+        $userFilter = $request->input('user');
+
+        if ($userFilter && Auth::check() && (int) $userFilter === Auth::id()) {
+            $query = Ad::query()->where('user_id', Auth::id());
+            $isMyAds = true;
+        } else {
+            $query = Ad::query()->where('status', 'active');
+        }
+        
+        // Filtres de recherche
+        $searchTerm = $request->input('q');
+        $location = $request->input('location');
+        $category = $request->input('category');
+        $radius = $request->input('radius', 10); // Rayon par défaut 10km
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
+        $serviceType = $request->input('service_type');
+        $sort = $request->input('sort', 'newest');
+        
+        // Recherche par mot-clé
+        if ($searchTerm) {
+            $query->search($searchTerm);
+        }
+        
+        // Recherche par catégorie
+        if ($category) {
+            $query->byCategory($category);
+        }
+        
+        // Recherche par type de service
+        if ($serviceType) {
+            $query->where('service_type', $serviceType);
+        }
+        
+        // Recherche par prix
+        if ($minPrice !== null || $maxPrice !== null) {
+            $query->byPriceRange($minPrice, $maxPrice);
+        }
+        
+        // Recherche géolocalisée
+        $hasGeoSearch = false;
+        if ($location) {
+            $geocodingService = new GeocodingService();
+            $coordinates = $geocodingService->geocode($location);
+            
+            if ($coordinates) {
+                $query->withinRadius(
+                    $coordinates['latitude'],
+                    $coordinates['longitude'],
+                    $radius
+                );
+                $hasGeoSearch = true;
+            } else {
+                // Fallback : recherche textuelle
+                $query->where('location', 'LIKE', "%{$location}%");
+            }
+        } elseif ($request->has('lat') && $request->has('lng')) {
+            // Si coordonnées directes fournies
+            $query->withinRadius(
+                $request->input('lat'),
+                $request->input('lng'),
+                $radius
+            );
+            $hasGeoSearch = true;
+        }
+        
+        // Tri
+        if (!$hasGeoSearch) {
+            switch ($sort) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                default:
+                    $query->latest();
+                    break;
+            }
+        }
+        
+        // Pagination
+        $ads = $query->paginate(12)->appends($request->query());
+        
+        // Services populaires pour suggestions
+        $popularServices = Ad::popularServicesByRegion($location ?? 'France');
+        
+        // Catégories disponibles - depuis config/categories.php (source unique)
+        $categories = array_merge(
+            array_keys(config('categories.services')),
+            array_keys(config('categories.marketplace'))
+        );
+        
+        return view('ads.index', compact('ads', 'popularServices', 'categories', 'isMyAds'));
+    }
+
+    /**
+     * Display the authenticated user's ads.
+     */
+    public function myAds(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $request->merge(['user' => Auth::id()]);
+        return $this->index($request);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        // Vérifier si l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour publier une annonce.');
+        }
+        
+        // Catégories disponibles - depuis config/categories.php (source unique)
+        $categories = array_merge(
+            array_keys(config('categories.services')),
+            array_keys(config('categories.marketplace'))
+        );
+        return view('ads.create', compact('categories'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $maxPhotos = Auth::user() && Auth::user()->hasActiveProSubscription() ? 4 : 2;
+
+        // Valider les données
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string',
+            'country' => 'required|string',
+            'city' => 'nullable|string',
+            'location' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'service_type' => 'required|in:offre,demande',
+            'radius_km' => 'nullable|integer|min:1|max:100',
+            'photos' => 'nullable|array|max:' . $maxPhotos,
+            'photos.*' => 'image|mimes:jpeg,png,webp|max:5120',
+            'reply_restriction' => 'nullable|in:everyone,pro_only,verified_only',
+            'visibility' => 'nullable|in:public,pro_targeted',
+            'target_categories' => 'nullable|array',
+            'target_categories.*' => 'string'
+        ]);
+
+        // Déterminer la localisation finale
+        $finalLocation = $request->location;
+        if (empty($finalLocation) && $request->city && $request->city !== '__other__') {
+            $finalLocation = $request->city;
+        }
+        
+        if (empty($finalLocation)) {
+            return back()->withErrors(['location' => 'Veuillez sélectionner une ville ou saisir une adresse.'])->withInput();
+        }
+
+        // Construire l'adresse complète pour le géocodage
+        $fullAddress = $finalLocation . ', ' . $request->country;
+
+        // Géocoder l'adresse
+        $geocodingService = new GeocodingService();
+        $coordinates = $geocodingService->geocode($fullAddress);
+        
+        // Créer l'annonce
+        $ad = new Ad();
+        $ad->title = $request->title;
+        $ad->description = $request->description;
+        $ad->category = $request->category;
+        $ad->location = $finalLocation;
+        $ad->price = $request->price;
+        $ad->service_type = $request->service_type;
+        $ad->radius_km = $request->radius_km ?? 10;
+        $ad->user_id = Auth::id();
+        $ad->country = $request->country;
+        $ad->reply_restriction = $request->reply_restriction ?? 'everyone';
+        $ad->visibility = $request->visibility ?? 'public';
+        $ad->target_categories = $request->visibility === 'pro_targeted' ? $request->target_categories : null;
+
+        // Si géocodage réussi
+        if ($coordinates) {
+            $ad->latitude = $coordinates['latitude'];
+            $ad->longitude = $coordinates['longitude'];
+            $ad->address = $coordinates['address'];
+            $ad->postal_code = $coordinates['postal_code'];
+        }
+        
+        $ad->save();
+
+        if ($request->hasFile('photos')) {
+            $paths = [];
+            foreach ($request->file('photos') as $photo) {
+                $paths[] = $photo->store('ads', 'public');
+            }
+            $ad->photos = $paths;
+            $ad->save();
+        }
+
+        // Notifier les professionnels correspondants
+        try {
+            $this->notifyMatchingProfessionals($ad);
+        } catch (\Exception $e) {
+            Log::warning('Failed to notify matching professionals for ad #' . $ad->id . ': ' . $e->getMessage());
+        }
+
+        // Rediriger vers la page après publication (urgent + boost)
+        return redirect()->route('boost.after-creation', $ad);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Ad $ad)
+    {
+        $isSaved = Auth::check() ? Auth::user()->hasSavedAd($ad) : false;
+        return view('ads.show', compact('ad', 'isSaved'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Ad $ad)
+    {
+        // Vérifier que l'utilisateur est propriétaire
+        if (Auth::id() !== $ad->user_id) {
+            abort(403);
+        }
+        
+        // Catégories disponibles - depuis config/categories.php (source unique)
+        $categories = array_merge(
+            array_keys(config('categories.services')),
+            array_keys(config('categories.marketplace'))
+        );
+        return view('ads.edit', compact('ad', 'categories'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Ad $ad)
+    {
+        // Vérifier que l'utilisateur est propriétaire
+        if (Auth::id() !== $ad->user_id) {
+            abort(403);
+        }
+        
+        $maxPhotos = Auth::user() && Auth::user()->hasActiveProSubscription() ? 4 : 2;
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|string',
+            'country' => 'required|string',
+            'city' => 'nullable|string',
+            'location' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'service_type' => 'required|in:offre,demande',
+            'radius_km' => 'nullable|integer|min:1|max:100',
+            'photos' => 'nullable|array|max:' . $maxPhotos,
+            'photos.*' => 'image|mimes:jpeg,png,webp|max:5120'
+        ]);
+
+        // Déterminer la localisation finale
+        $finalLocation = $request->location;
+        if (empty($finalLocation) && $request->city && $request->city !== '__other__') {
+            $finalLocation = $request->city;
+        }
+        
+        if (empty($finalLocation)) {
+            return back()->withErrors(['location' => 'Veuillez sélectionner une ville ou saisir une adresse.'])->withInput();
+        }
+
+        // Re-géocoder si la localisation ou le pays a changé
+        if ($ad->location !== $finalLocation || $ad->country !== $request->country) {
+            $fullAddress = $finalLocation . ', ' . $request->country;
+            $geocodingService = new GeocodingService();
+            $coordinates = $geocodingService->geocode($fullAddress);
+            
+            if ($coordinates) {
+                $ad->latitude = $coordinates['latitude'];
+                $ad->longitude = $coordinates['longitude'];
+                $ad->address = $coordinates['address'];
+                $ad->postal_code = $coordinates['postal_code'];
+            }
+        }
+        
+        $ad->title = $request->title;
+        $ad->description = $request->description;
+        $ad->category = $request->category;
+        $ad->location = $finalLocation;
+        $ad->country = $request->country;
+        $ad->price = $request->price;
+        $ad->service_type = $request->service_type;
+        $ad->radius_km = $request->radius_km ?? 10;
+        $ad->reply_restriction = $request->reply_restriction ?? 'everyone';
+        $ad->visibility = $request->visibility ?? 'public';
+        $ad->target_categories = $request->visibility === 'pro_targeted' ? $request->target_categories : null;
+        $ad->save();
+
+        if ($request->hasFile('photos')) {
+            $existing = $ad->photos ?? [];
+            foreach ($existing as $path) {
+                Storage::disk('public')->delete($path);
+            }
+            $paths = [];
+            foreach ($request->file('photos') as $photo) {
+                $paths[] = $photo->store('ads', 'public');
+            }
+            $ad->photos = $paths;
+            $ad->save();
+        }
+
+        return redirect()->route('ads.show', $ad)->with('success', 'Annonce mise à jour avec succès !');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Ad $ad)
+    {
+        // Vérifier que l'utilisateur est propriétaire ou admin
+        if (Auth::id() !== $ad->user_id && Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+        
+        $ad->delete();
+        
+        return redirect()->back()->with('success', 'Annonce supprimée avec succès.');
+    }
+
+    /**
+     * Notifier les professionnels dont le domaine correspond à la catégorie de l'annonce.
+     */
+    protected function notifyMatchingProfessionals(Ad $ad): void
+    {
+        $category = $ad->category;
+        if (!$category) {
+            return;
+        }
+
+        // Trouver les pros ayant cette catégorie dans leurs services actifs
+        $matchingUserIds = UserService::where('is_active', true)
+            ->where('main_category', $category)
+            ->where('user_id', '!=', $ad->user_id)
+            ->pluck('user_id')
+            ->unique();
+
+        // Aussi chercher dans pro_service_categories (JSON array sur le profil pro)
+        $proUsers = User::where('id', '!=', $ad->user_id)
+            ->where(function ($q) {
+                $q->where('user_type', 'professionnel')
+                  ->orWhere('is_service_provider', true);
+            })
+            ->where('pro_notifications_realtime', true)
+            ->get()
+            ->filter(function ($user) use ($category) {
+                $proCategories = $user->pro_service_categories ?? [];
+                return in_array($category, $proCategories);
+            })
+            ->pluck('id');
+
+        $allUserIds = $matchingUserIds->merge($proUsers)->unique();
+
+        if ($allUserIds->isEmpty()) {
+            return;
+        }
+
+        $publisher = $ad->user;
+        $professionals = User::whereIn('id', $allUserIds)->get();
+
+        foreach ($professionals as $pro) {
+            try {
+                $pro->notify(new NewAdMatchingNotification($ad, $publisher));
+            } catch (\Exception $e) {
+                Log::warning('Notification failed for pro #' . $pro->id . ': ' . $e->getMessage());
+            }
+        }
+    }
+}

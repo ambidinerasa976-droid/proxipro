@@ -22,3 +22,15 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+desktop.ini
+*.lnk
+tmpclaude-*
+/CAPTURE/
+/page accueil/
+/ste/
+/datetime
+/composer-setup.php
+*.sqlite
+/database/*.sqlite*
+/structure_check.txt
+/feed-accueil-standalone.html

@@ -1,0 +1,606 @@
+@extends('layouts.app')
+
+@section('title', 'Annonce publiée - Boostez maintenant ! - ProxiPro')
+
+@push('styles')
+<style>
+    body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); min-height: 100vh; }
+    
+    .success-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    /* Success Header */
+    .success-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        animation: successPop 0.6s ease-out;
+    }
+    
+    @keyframes successPop {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .success-icon i {
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .success-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #166534;
+        margin-bottom: 12px;
+    }
+    
+    .success-header p {
+        color: #16a34a;
+        font-size: 1.1rem;
+    }
+    
+    /* Points Earned */
+    .points-earned {
+        background: white;
+        border-radius: 16px;
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 40px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    
+    .points-earned i {
+        font-size: 1.8rem;
+        color: #f59e0b;
+    }
+    
+    .points-earned span {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    /* Urgent CTA Section */
+    .urgent-cta {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 30px;
+        border: 3px solid #fca5a5;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .urgent-cta::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #dc2626, #ea580c, #dc2626);
+    }
+    
+    .urgent-icon {
+        font-size: 3.5rem;
+        margin-bottom: 16px;
+        display: inline-block;
+        animation: urgentPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes urgentPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+    }
+    
+    .urgent-cta h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #dc2626;
+        margin-bottom: 12px;
+    }
+    
+    .urgent-cta p.urgent-desc {
+        color: #64748b;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        max-width: 550px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .urgent-benefits {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
+    
+    .urgent-benefit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: #374151;
+        font-weight: 600;
+    }
+    
+    .urgent-benefit i {
+        color: #dc2626;
+    }
+    
+    .urgent-price-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        border: 2px solid #fca5a5;
+        border-radius: 14px;
+        padding: 14px 28px;
+        margin-bottom: 24px;
+    }
+    
+    .urgent-price-tag .price {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #dc2626;
+    }
+    
+    .urgent-price-tag .duration {
+        font-size: 0.9rem;
+        color: #991b1b;
+        font-weight: 600;
+    }
+    
+    .btn-urgent {
+        background: linear-gradient(135deg, #dc2626, #ea580c);
+        color: white;
+        padding: 16px 40px;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    
+    .btn-urgent:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(220, 38, 38, 0.4);
+        color: white;
+    }
+    
+    .urgent-points-info {
+        margin-top: 16px;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    /* Boost CTA Section */
+    .boost-cta {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 30px;
+        border: 3px solid #fde68a;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .boost-cta::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+    }
+    
+    .rocket-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: inline-block;
+        animation: rocketFloat 2s ease-in-out infinite;
+    }
+    
+    @keyframes rocketFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .boost-cta h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+    
+    .boost-cta p {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Quick Packages */
+    .quick-packages {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+        .quick-packages {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .quick-package {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .quick-package:hover {
+        border-color: var(--pkg-color, #3b82f6);
+        background: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .quick-package.selected {
+        border-color: var(--pkg-color, #3b82f6);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .quick-package-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: white;
+        margin: 0 auto 12px;
+    }
+    
+    .quick-package h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    
+    .quick-package-duration {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+    }
+    
+    .quick-package-price {
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+    
+    /* CTA Buttons */
+    .cta-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-boost-now {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        padding: 16px 40px;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    
+    .btn-boost-now:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(245, 158, 11, 0.4);
+        color: white;
+    }
+    
+    .btn-skip {
+        background: transparent;
+        color: #64748b;
+        padding: 16px 30px;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .btn-skip:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+    
+    /* Stats Preview */
+    .stats-preview {
+        background: linear-gradient(135deg, #312e81, #4c1d95);
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-preview {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-item i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+    
+    .stat-item h5 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+    
+    .stat-item p {
+        opacity: 0.8;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    /* Ad Summary */
+    .ad-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .ad-summary-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    
+    .ad-summary-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .ad-summary-info h4 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    
+    .ad-summary-info p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="success-container">
+    <!-- Success Header -->
+    <div class="success-header">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1>🎉 Votre annonce est publiée !</h1>
+        <p>Elle est maintenant visible par tous les utilisateurs de ProxiPro</p>
+    </div>
+    
+    <!-- Points Earned -->
+    <div class="points-earned">
+        <i class="fas fa-coins"></i>
+        <span>+10 points gagnés pour cette publication !</span>
+    </div>
+    
+    <!-- Ad Summary -->
+    <div class="ad-summary">
+        <div class="ad-summary-img">
+            @if($ad->photos && count($ad->photos) > 0)
+                <img src="{{ asset('storage/' . $ad->photos[0]) }}" alt="{{ $ad->title }}">
+            @else
+                <i class="fas fa-image"></i>
+            @endif
+        </div>
+        <div class="ad-summary-info">
+            <h4>{{ $ad->title }}</h4>
+            <p><i class="fas fa-tag me-1"></i>{{ $ad->category }} • <i class="fas fa-map-marker-alt me-1"></i>{{ $ad->location }}</p>
+        </div>
+    </div>
+
+    <!-- Urgent CTA -->
+    <div class="urgent-cta">
+        <div class="urgent-icon">🔥</div>
+        <h2>Publier en mode URGENT</h2>
+        <p class="urgent-desc">Votre annonce sera épinglée dans la section <strong>"Annonces Urgentes"</strong> de la page d'accueil pendant 7 jours et sera vue en priorité !</p>
+        
+        <div class="urgent-benefits">
+            <div class="urgent-benefit">
+                <i class="fas fa-thumbtack"></i> Épinglée en page d'accueil
+            </div>
+            <div class="urgent-benefit">
+                <i class="fas fa-clock"></i> 7 jours de visibilité
+            </div>
+            <div class="urgent-benefit">
+                <i class="fas fa-bolt"></i> Priorité maximale
+            </div>
+        </div>
+        
+        <div class="urgent-price-tag">
+            <span class="price">15 points</span>
+            <br>
+            <span class="duration">pendant 7 jours</span>
+        </div>
+        
+        <div>
+            @if(($userPoints ?? 0) >= 15)
+                <form action="{{ route('ads.make-urgent', $ad) }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn-urgent" onclick="return confirm('Confirmer la publication en mode URGENT pour 15 points ?')">
+                        <i class="fas fa-fire"></i> Publier en URGENT — 15 pts
+                    </button>
+                </form>
+                <div class="urgent-points-info">
+                    <i class="fas fa-coins text-warning me-1"></i>
+                    Votre solde : <strong>{{ number_format($userPoints, 0, ',', ' ') }} points</strong> (il vous restera {{ number_format($userPoints - 15, 0, ',', ' ') }} points)
+                </div>
+            @else
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 14px; padding: 20px; display: inline-block; max-width: 450px;">
+                    <p style="color: #991b1b; font-weight: 600; margin-bottom: 8px;">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Points insuffisants
+                    </p>
+                    <p style="color: #7f1d1d; font-size: 0.9rem; margin-bottom: 12px;">
+                        Vous avez <strong>{{ number_format($userPoints, 0, ',', ' ') }} points</strong>, il vous faut <strong>15 points</strong>.
+                    </p>
+                    <a href="{{ route('pricing.index') }}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 10px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-coins"></i> Acheter des points
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+    
+    <!-- Boost CTA -->
+    <div class="boost-cta">
+        <div class="rocket-icon">🚀</div>
+        <h2>Boostez votre annonce maintenant !</h2>
+        <p>Apparaissez dans la section <strong>"Professionnels Premium"</strong> de la page d'accueil et multipliez vos chances d'être contacté par 5x</p>
+        
+        <!-- Quick Packages -->
+        <div class="quick-packages">
+            @foreach($packages as $key => $package)
+            <div class="quick-package" style="--pkg-color: {{ $package['color'] }};" onclick="selectPackage('{{ $key }}')">
+                <div class="quick-package-icon" style="background: {{ $package['color'] }};">
+                    <i class="{{ $package['icon'] }}"></i>
+                </div>
+                <h4>{{ $package['name'] }}</h4>
+                <div class="quick-package-duration">{{ $package['duration_days'] }} jours</div>
+                <div class="quick-package-price" style="color: {{ $package['color'] }};">
+                    {{ $package['price_points'] }} pts <span style="color: #94a3b8; font-weight: 400;">ou</span> {{ $package['price_euros'] }}€
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        <!-- Stats Preview -->
+        <div class="stats-preview">
+            <div class="stat-item">
+                <i class="fas fa-eye"></i>
+                <h5>x10</h5>
+                <p>Plus de visibilité</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-users"></i>
+                <h5>x5</h5>
+                <p>Plus de contacts</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-crown"></i>
+                <h5>Premium</h5>
+                <p>Badge de confiance</p>
+            </div>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="cta-buttons">
+            <a href="{{ route('boost.show', $ad) }}" class="btn-boost-now">
+                <i class="fas fa-rocket"></i> Booster maintenant
+            </a>
+            <a href="{{ route('ads.show', $ad) }}" class="btn-skip">
+                <i class="fas fa-arrow-right me-1"></i> Voir mon annonce
+            </a>
+        </div>
+    </div>
+    
+    <!-- User Points Info -->
+    <div class="text-center" style="color: #64748b;">
+        <p>
+            <i class="fas fa-coins text-warning me-1"></i>
+            Vous avez actuellement <strong>{{ number_format($userPoints, 0, ',', ' ') }} points</strong>.
+            <a href="{{ route('pricing.index') }}" style="color: #3b82f6;">Acheter des points</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function selectPackage(pkg) {
+    document.querySelectorAll('.quick-package').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+</script>
+@endsection

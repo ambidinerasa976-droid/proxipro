@@ -1,0 +1,256 @@
+@extends('admin.layouts.app')
+
+@section('title', 'Paramètres')
+
+@section('content')
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="h4 fw-bold">
+            <i class="fas fa-cog text-secondary me-2"></i>Paramètres de la Plateforme
+        </h2>
+        <p class="text-muted mb-0">Configuration générale de {{ $settings['general']['site_name'] ?? 'ProxiPro' }}</p>
+    </div>
+</div>
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+<div class="row g-4">
+    <!-- Paramètres généraux -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-sliders-h me-2 text-primary"></i>
+                    Paramètres Généraux
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.settings.general') }}" method="POST">
+                    @csrf
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nom de la plateforme</label>
+                        <input type="text" class="form-control" name="site_name" value="{{ $settings['general']['site_name'] ?? 'ProxiPro' }}">
+                        <small class="text-muted">Ce nom sera affiché dans tout le site</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email de contact</label>
+                        <input type="email" class="form-control" name="contact_email" value="{{ $settings['general']['contact_email'] ?? 'contact@ProxiPro.com' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mode maintenance</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenanceMode" {{ ($settings['general']['maintenance_mode'] ?? '0') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="maintenanceMode">Activer le mode maintenance</label>
+                        </div>
+                        <small class="text-muted">Le site sera inaccessible aux utilisateurs pendant la maintenance</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Paramètres des annonces -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-bullhorn me-2 text-success"></i>
+                    Paramètres des Annonces
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.settings.ads') }}" method="POST">
+                    @csrf
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Annonces gratuites par mois (plan FREE)</label>
+                        <input type="number" class="form-control" name="free_ads_limit" value="{{ $settings['ads']['free_ads_limit'] ?? '3' }}" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Durée de validité des annonces (jours)</label>
+                        <input type="number" class="form-control" name="ad_validity_days" value="{{ $settings['ads']['ad_validity_days'] ?? '30' }}" min="1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Modération automatique</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="auto_moderation" id="autoModeration" {{ ($settings['ads']['auto_moderation'] ?? '1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="autoModeration">Approuver automatiquement les nouvelles annonces</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Paramètres des points -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-coins me-2 text-warning"></i>
+                    Système de Points
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.settings.points') }}" method="POST">
+                    @csrf
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Points par inscription</label>
+                        <input type="number" class="form-control" name="signup_points" value="{{ $settings['points']['signup_points'] ?? '50' }}" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Points par connexion quotidienne</label>
+                        <input type="number" class="form-control" name="daily_login_points" value="{{ $settings['points']['daily_login_points'] ?? '5' }}" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Points par partage social</label>
+                        <input type="number" class="form-control" name="share_points" value="{{ $settings['points']['share_points'] ?? '10' }}" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Coût en points par message</label>
+                        <input type="number" class="form-control" name="message_cost" value="{{ $settings['points']['message_cost'] ?? '1' }}" min="0">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Paramètres email -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-envelope me-2 text-info"></i>
+                    Configuration Email
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.settings.email') }}" method="POST">
+                    @csrf
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Driver SMTP</label>
+                        <select class="form-select" name="mail_driver">
+                            <option value="smtp" {{ ($settings['email']['mail_driver'] ?? 'smtp') == 'smtp' ? 'selected' : '' }}>SMTP</option>
+                            <option value="mailgun" {{ ($settings['email']['mail_driver'] ?? '') == 'mailgun' ? 'selected' : '' }}>Mailgun</option>
+                            <option value="ses" {{ ($settings['email']['mail_driver'] ?? '') == 'ses' ? 'selected' : '' }}>Amazon SES</option>
+                            <option value="log" {{ ($settings['email']['mail_driver'] ?? '') == 'log' ? 'selected' : '' }}>Log (dev)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notifications par email</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="email_new_user" id="emailNewUser" {{ ($settings['email']['email_new_user'] ?? '1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="emailNewUser">Nouvelle inscription</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="email_new_ad" id="emailNewAd" {{ ($settings['email']['email_new_ad'] ?? '1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="emailNewAd">Nouvelle annonce</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="email_new_message" id="emailNewMessage" {{ ($settings['email']['email_new_message'] ?? '1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="emailNewMessage">Nouveau message</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Informations système -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-server me-2 text-secondary"></i>
+                    Informations Système
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Version Laravel</p>
+                        <p class="fw-bold">{{ app()->version() }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Version PHP</p>
+                        <p class="fw-bold">{{ phpversion() }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Environnement</p>
+                        <p class="fw-bold">
+                            <span class="badge bg-{{ app()->environment('production') ? 'danger' : 'success' }}">
+                                {{ app()->environment() }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted">Cache Driver</p>
+                        <p class="fw-bold">{{ config('cache.default') }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex gap-2 flex-wrap">
+                    <form action="{{ route('admin.settings.system') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="action" value="clear_cache">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="fas fa-broom me-2"></i>Vider le cache
+                        </button>
+                    </form>
+                    
+                    <form action="{{ route('admin.settings.system') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="action" value="optimize">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-rocket me-2"></i>Optimiser
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
