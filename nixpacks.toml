@@ -6,6 +6,8 @@ nixPkgs = ['...', 'php83', 'php83Extensions.pdo', 'php83Extensions.pdo_mysql', '
 
 [phases.install]
 cmds = [
+    'cp .env.example .env || true',
+    'mkdir -p database && touch database/database.sqlite',
     'npm ci',
     'composer install --no-dev --optimize-autoloader'
 ]
