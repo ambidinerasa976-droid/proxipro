@@ -40,6 +40,9 @@ jobs:
       - name: Copy environment file
         run: cp .env.example .env
 
+      - name: Create SQLite database
+        run: touch database/database.sqlite
+
       - name: Generate app key
         run: php artisan key:generate
 
