@@ -1,7 +1,7 @@
 # ============================================================
 # Stage 1 – Build frontend assets with Node.js
 # ============================================================
-FROM node:20-alpine AS frontend
+FROM node:22-alpine AS frontend
 
 WORKDIR /app
 
@@ -54,7 +54,10 @@ RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --opti
 COPY . .
 
 # Re-run composer scripts (post-autoload-dump, etc.)
-RUN composer dump-autoload --optimize
+# Create a temporary SQLite file so artisan package:discover can boot
+RUN mkdir -p database && touch database/database.sqlite \
+    && composer dump-autoload --optimize \
+    && rm -f database/database.sqlite
 
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build ./public/build
