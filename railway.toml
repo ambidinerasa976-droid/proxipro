@@ -8,7 +8,7 @@
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Railway injects $PORT; our Dockerfile + Apache honour it
+# Railway injects $PORT; our Dockerfile + Apache honor it
 healthcheckPath = "/"
 healthcheckTimeout = 120
 restartPolicyType = "on_failure"
