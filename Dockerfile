@@ -66,10 +66,8 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 # Create the SQLite database directory with correct permissions
 RUN mkdir -p database && chown -R www-data:www-data database && chmod -R 775 database
 
-# Railway injects PORT; Apache must listen on it
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
 # Default environment variables for production
+# PORT=8080 is a fallback for local testing; Railway overrides it at runtime
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
