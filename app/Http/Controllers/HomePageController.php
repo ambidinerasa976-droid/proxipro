@@ -11,12 +11,26 @@ class HomePageController extends Controller
     public function index()
     {
         // Statistiques réelles
-        $totalAds = Ad::where('status', 'active')->count();
-        $totalPros = User::where(function ($q) {
-            $q->where('user_type', 'professionnel')
-              ->orWhere('is_service_provider', true);
-        })->count();
-        $totalUsers = User::count();
+        try {
+            $totalAds = Ad::where('status', 'active')->count();
+        } catch (\Exception $e) {
+            $totalAds = 0;
+        }
+
+        try {
+            $totalPros = User::where(function ($q) {
+                $q->where('user_type', 'professionnel')
+                  ->orWhere('is_service_provider', true);
+            })->count();
+        } catch (\Exception $e) {
+            $totalPros = 0;
+        }
+
+        try {
+            $totalUsers = User::count();
+        } catch (\Exception $e) {
+            $totalUsers = 0;
+        }
 
         // Mega menu categories with subcategories + counts
         $categoriesWithSubs = [
@@ -288,38 +302,56 @@ class HomePageController extends Controller
             ],
         ];
 
-        foreach ($categoriesWithSubs as &$category) {
-            $total = 0;
-            foreach ($category['subs'] as &$sub) {
-                $subCount = Ad::where('category', $sub['name'])
-                    ->where('status', 'active')
-                    ->count();
-                $sub['count'] = $subCount;
-                $total += $subCount;
+        try {
+            foreach ($categoriesWithSubs as &$category) {
+                $total = 0;
+                foreach ($category['subs'] as &$sub) {
+                    $subCount = Ad::where('category', $sub['name'])
+                        ->where('status', 'active')
+                        ->count();
+                    $sub['count'] = $subCount;
+                    $total += $subCount;
+                }
+                $category['total'] = $total;
             }
-            $category['total'] = $total;
+            unset($category, $sub);
+        } catch (\Exception $e) {
+            foreach ($categoriesWithSubs as &$category) {
+                $category['total'] = 0;
+                foreach ($category['subs'] as &$sub) {
+                    $sub['count'] = 0;
+                }
+            }
+            unset($category, $sub);
         }
-        unset($category, $sub);
 
         // Dernieres annonces (pour une eventuelle section)
-        $latestAds = Ad::where('status', 'active')
-            ->latest()
-            ->take(6)
-            ->get();
+        try {
+            $latestAds = Ad::where('status', 'active')
+                ->latest()
+                ->take(6)
+                ->get();
+        } catch (\Exception $e) {
+            $latestAds = collect();
+        }
 
         // Prestataires mis en avant (avec abonnement Pro ou les plus actifs)
-        $featuredPros = User::where(function ($q) {
-                $q->where('user_type', 'professionnel')
-                  ->orWhere('is_service_provider', true);
-            })
-            ->whereNotNull('profession')
-            ->withCount(['ads as active_ads_count' => function ($q) {
-                $q->where('status', 'active');
-            }])
-            ->orderByRaw("CASE WHEN stripe_id IS NOT NULL THEN 0 ELSE 1 END")
-            ->orderByDesc('active_ads_count')
-            ->take(6)
-            ->get();
+        try {
+            $featuredPros = User::where(function ($q) {
+                    $q->where('user_type', 'professionnel')
+                      ->orWhere('is_service_provider', true);
+                })
+                ->whereNotNull('profession')
+                ->withCount(['ads as active_ads_count' => function ($q) {
+                    $q->where('status', 'active');
+                }])
+                ->orderByRaw("CASE WHEN stripe_id IS NOT NULL THEN 0 ELSE 1 END")
+                ->orderByDesc('active_ads_count')
+                ->take(6)
+                ->get();
+        } catch (\Exception $e) {
+            $featuredPros = collect();
+        }
 
         return view('pages.home', compact('totalAds', 'totalPros', 'totalUsers', 'latestAds', 'featuredPros', 'categoriesWithSubs'));
     }
