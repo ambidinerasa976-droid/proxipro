@@ -18,13 +18,19 @@ cmds = [
   # On Railway with PostgreSQL these will run again at startup against the
   # real database (see the start command below).
   "php artisan migrate --force || true",
-  "php artisan route:cache || true",
-  "php artisan view:cache || true",
+  # Build frontend assets FIRST so the Vite manifest (public/build/.vite/manifest.json)
+  # exists before any artisan caching commands that resolve @vite() directives.
   "npm ci",
   "npm run build",
+  "php artisan route:cache || true",
+  # view:cache runs after npm run build so @vite() directives resolve correctly
+  # against the manifest that was just produced.
+  "php artisan view:cache || true",
 ]
 
 [start]
 # At runtime Railway injects the real DB_* variables (PostgreSQL).
 # Migrations run here against the live database before the server starts.
-cmd = "php artisan migrate --force && php artisan config:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
+# config:cache and view:cache re-run here so they pick up the real APP_URL
+# and any other runtime environment variables injected by Railway.
+cmd = "php artisan migrate --force && php artisan config:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
