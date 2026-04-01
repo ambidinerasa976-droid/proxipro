@@ -29,4 +29,4 @@ cmds = [
 # 3. Cache config (picks up real APP_URL, DB_*, SESSION_DRIVER, etc.).
 # 4. Cache views AFTER config so @vite() and dynamic URLs are correct.
 # 5. Start the server.
-cmd = "composer dump-autoload --optimize && php artisan migrate --force && php artisan config:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
+cmd = "composer dump-autoload --optimize && php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && php artisan config:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
