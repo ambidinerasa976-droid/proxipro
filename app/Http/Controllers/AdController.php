@@ -466,16 +466,25 @@ class AdController extends Controller
     /**
      * Notifier les professionnels dont le domaine correspond à la catégorie de l'annonce.
      */
-    protected function notifyMatchingProfessionals(Ad $ad): void
+    public function notifyMatchingProfessionals(Ad $ad): void
     {
         $category = $ad->category;
         if (!$category) {
             return;
         }
 
-        // Trouver les pros ayant cette catégorie dans leurs services actifs
+        $publisher = $ad->user;
+        if (!$publisher) {
+            Log::warning('Cannot notify professionals: ad #' . $ad->id . ' has no associated user.');
+            return;
+        }
+
+        // Trouver les pros ayant cette catégorie dans leurs services actifs (main_category OU subcategory)
         $matchingUserIds = UserService::where('is_active', true)
-            ->where('main_category', $category)
+            ->where(function ($q) use ($category) {
+                $q->where('main_category', $category)
+                  ->orWhere('subcategory', $category);
+            })
             ->where('user_id', '!=', $ad->user_id)
             ->pluck('user_id')
             ->unique();
@@ -490,7 +499,9 @@ class AdController extends Controller
             ->get()
             ->filter(function ($user) use ($category) {
                 $proCategories = $user->pro_service_categories ?? [];
-                return in_array($category, $proCategories);
+                $subCategories = $user->service_subcategories ?? [];
+                return in_array($category, $proCategories)
+                    || in_array($category, is_array($subCategories) ? $subCategories : []);
             })
             ->pluck('id');
 
@@ -500,15 +511,23 @@ class AdController extends Controller
             return;
         }
 
-        $publisher = $ad->user;
         $professionals = User::whereIn('id', $allUserIds)->get();
+        $notifiedCount = 0;
 
         foreach ($professionals as $pro) {
             try {
                 $pro->notify(new NewAdMatchingNotification($ad, $publisher));
+                $notifiedCount++;
             } catch (\Exception $e) {
-                Log::warning('Notification failed for pro #' . $pro->id . ': ' . $e->getMessage());
+                Log::error('Notification failed for pro #' . $pro->id . ' on ad #' . $ad->id . ': ' . $e->getMessage(), [
+                    'exception' => get_class($e),
+                    'ad_category' => $category,
+                ]);
             }
+        }
+
+        if ($notifiedCount > 0) {
+            Log::info('Notified ' . $notifiedCount . '/' . $professionals->count() . ' professionals for ad #' . $ad->id . ' (category: ' . $category . ')');
         }
     }
 }

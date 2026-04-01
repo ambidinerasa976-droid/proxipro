@@ -5,12 +5,17 @@ namespace App\Notifications;
 use App\Models\Ad;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
-class NewAdMatchingNotification extends Notification
+class NewAdMatchingNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    public int $tries = 3;
+    public int $backoff = 60;
 
     protected Ad $ad;
     protected User $publisher;
@@ -52,6 +57,14 @@ class NewAdMatchingNotification extends Notification
             ->line('')
             ->line('Vous recevez cet email car vos compétences correspondent à la catégorie « ' . $this->ad->category . ' ». Vous pouvez gérer vos préférences de notification depuis votre Espace Pro.')
             ->salutation('L\'équipe ProxiPro');
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('NewAdMatchingNotification permanently failed for ad #' . $this->ad->id, [
+            'exception' => $exception->getMessage(),
+            'publisher' => $this->publisher->id,
+        ]);
     }
 
     public function toArray(object $notifiable): array
