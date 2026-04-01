@@ -19,7 +19,7 @@ return [
     |
     */
     'principal_admin' => [
-        'email' => env('PRINCIPAL_ADMIN_EMAIL', 'hardali.soudj@.com'),
+        'email' => env('PRINCIPAL_ADMIN_EMAIL', 'hardali.soudj@gmail.com'),
         'name' => 'Hardali SAÏD',
     ],
 
