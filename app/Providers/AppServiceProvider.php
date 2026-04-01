@@ -6,6 +6,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS in production (Railway reverse proxy)
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
             return (new MailMessage)
                 ->subject('Verification de votre adresse e-mail')
