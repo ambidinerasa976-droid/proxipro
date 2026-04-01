@@ -26,7 +26,7 @@
                 <a href="{{ route('messages.show', $conversation->id) }}" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex align-items-center gap-3">
                         @if($otherUser && $otherUser->avatar)
-                            <img src="{{ asset('storage/' . $otherUser->avatar) }}" alt="" 
+                            <img src="{{ storage_url($otherUser->avatar) }}" alt="" 
                                  class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
                         @else
                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 

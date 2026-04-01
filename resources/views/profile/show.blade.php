@@ -18,7 +18,7 @@
                 <div class="card-body text-center py-5">
                     <!-- Avatar -->
                     @if($user->avatar)
-                            <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" 
+                            <img src="{{ storage_url($user->avatar) }}" alt="Avatar" 
                                 class="mb-4" style="width: 180px; height: 180px; object-fit: cover; border-radius: 12px;">
                     @else
                             <div class="bg-primary text-white d-inline-flex align-items-center justify-content-center mb-4" 
@@ -230,7 +230,7 @@
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center p-3 bg-light rounded-3">
                                         @if($ad->images && count($ad->images) > 0)
-                                            <img src="{{ asset('storage/' . $ad->images[0]) }}" alt="" 
+                                            <img src="{{ storage_url($ad->images[0]) }}" alt="" 
                                                  class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                                         @else
                                             <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 

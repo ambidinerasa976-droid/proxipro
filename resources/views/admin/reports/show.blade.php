@@ -72,7 +72,7 @@
                         <div class="card-body">
                             <div class="d-flex align-items-start gap-3">
                                 @if($report->ad->user && $report->ad->user->avatar)
-                                    <img src="{{ asset('storage/' . $report->ad->user->avatar) }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
+                                    <img src="{{ storage_url($report->ad->user->avatar) }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">
                                 @else
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:48px;height:48px;font-size:1rem;font-weight:700;">{{ strtoupper(substr($report->ad->user->name ?? 'U', 0, 1)) }}</div>
                                 @endif
@@ -101,7 +101,7 @@
                                     @if(!empty($photos))
                                     <div class="d-flex gap-2 mt-3 flex-wrap">
                                         @foreach(array_slice($photos, 0, 4) as $photo)
-                                            <img src="{{ asset('storage/' . $photo) }}" class="rounded" style="width:100px;height:80px;object-fit:cover;" onerror="this.style.display='none'">
+                                            <img src="{{ storage_url($photo) }}" class="rounded" style="width:100px;height:80px;object-fit:cover;" onerror="this.style.display='none'">
                                         @endforeach
                                     </div>
                                     @endif
@@ -165,7 +165,7 @@
                 <div class="card-body text-center">
                     @if($report->reporter)
                         @if($report->reporter->avatar)
-                            <img src="{{ asset('storage/' . $report->reporter->avatar) }}" class="rounded-circle mb-2" style="width:64px;height:64px;object-fit:cover;">
+                            <img src="{{ storage_url($report->reporter->avatar) }}" class="rounded-circle mb-2" style="width:64px;height:64px;object-fit:cover;">
                         @else
                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width:64px;height:64px;font-size:1.3rem;font-weight:700;">{{ strtoupper(substr($report->reporter->name, 0, 1)) }}</div>
                         @endif

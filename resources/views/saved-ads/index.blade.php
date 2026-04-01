@@ -262,7 +262,7 @@
                 <div class="saved-ad-card" data-ad-id="{{ $ad->id }}">
                     <div class="saved-ad-image">
                         @if(!empty($ad->photos) && isset($ad->photos[0]))
-                            <img src="{{ asset('storage/'.$ad->photos[0]) }}" alt="{{ $ad->title }}">
+                            <img src="{{ storage_url($ad->photos[0]) }}" alt="{{ $ad->title }}">
                         @else
                             <div class="placeholder">
                                 <i class="fas fa-image"></i>

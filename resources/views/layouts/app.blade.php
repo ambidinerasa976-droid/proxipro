@@ -6614,7 +6614,7 @@
                         <div class="dropdown">
                             <button class="user-menu-btn d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->avatar)
-                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="user-avatar" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    <img src="{{ storage_url(Auth::user()->avatar) }}" alt="Avatar" class="user-avatar" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 @else
                                     <div class="user-avatar-placeholder" style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -6630,7 +6630,7 @@
                                 <li class="px-3 py-2 border-bottom">
                                     <div class="d-flex align-items-center">
                                         @if(Auth::user()->avatar)
-                                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="" class="user-avatar me-3" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                            <img src="{{ storage_url(Auth::user()->avatar) }}" alt="" class="user-avatar me-3" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                                         @else
                                             <div class="user-avatar-placeholder me-3" style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; border: 2px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                                         @endif

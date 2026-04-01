@@ -116,7 +116,7 @@
                                     @if($report->ad)
                                         <div class="d-flex align-items-center gap-2">
                                             @if($report->ad->user && $report->ad->user->avatar)
-                                                <img src="{{ asset('storage/' . $report->ad->user->avatar) }}" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
+                                                <img src="{{ storage_url($report->ad->user->avatar) }}" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;">
                                             @else
                                                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;font-size:0.75rem;">{{ strtoupper(substr($report->ad->user->name ?? 'U', 0, 1)) }}</div>
                                             @endif

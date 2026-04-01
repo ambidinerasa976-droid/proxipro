@@ -254,7 +254,7 @@ body { background: #f0f2f5; }
 
                 <div class="pro-card-header">
                     @if($pro->avatar)
-                        <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}" class="pro-card-avatar">
+                        <img src="{{ storage_url($pro->avatar) }}" alt="{{ $pro->name }}" class="pro-card-avatar">
                     @else
                         <div class="pro-card-avatar-placeholder">{{ strtoupper(substr($pro->name, 0, 1)) }}</div>
                     @endif
@@ -311,7 +311,7 @@ body { background: #f0f2f5; }
 
                     <div class="pro-card-header">
                         @if($pro->avatar)
-                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}" class="pro-card-avatar">
+                            <img src="{{ storage_url($pro->avatar) }}" alt="{{ $pro->name }}" class="pro-card-avatar">
                         @else
                             <div class="pro-card-avatar-placeholder">{{ strtoupper(substr($pro->name, 0, 1)) }}</div>
                         @endif

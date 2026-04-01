@@ -62,8 +62,8 @@
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ asset('storage/' . $doc->file_path) }}" target="_blank"><i class="fas fa-eye me-2"></i>Voir</a></li>
-                            <li><a class="dropdown-item" href="{{ asset('storage/' . $doc->file_path) }}" download><i class="fas fa-download me-2"></i>Télécharger</a></li>
+                            <li><a class="dropdown-item" href="{{ storage_url($doc->file_path) }}" target="_blank"><i class="fas fa-eye me-2"></i>Voir</a></li>
+                            <li><a class="dropdown-item" href="{{ storage_url($doc->file_path) }}" download><i class="fas fa-download me-2"></i>Télécharger</a></li>
                             <li>
                                 <form method="POST" action="{{ route('pro.documents.delete', $doc->id) }}" onsubmit="return confirm('Supprimer ce document ?')">
                                     @csrf @method('DELETE')

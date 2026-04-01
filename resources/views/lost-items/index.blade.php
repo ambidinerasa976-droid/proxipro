@@ -373,7 +373,7 @@
                                             $images = is_array($item->images) ? $item->images : json_decode($item->images, true);
                                         @endphp
                                         @if($images && count($images) > 0)
-                                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $item->title }}">
+                                            <img src="{{ storage_url($images[0]) }}" alt="{{ $item->title }}">
                                         @else
                                             <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #d1d5db;">
                                                 {{ $categoryIcons[$item->category] ?? '📦' }}

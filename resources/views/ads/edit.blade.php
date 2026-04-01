@@ -812,7 +812,7 @@
                 <div class="photo-preview-grid mt-3" id="existing-photos-grid">
                     @foreach($ad->photos as $index => $photo)
                         <div class="photo-preview-item" id="existing-photo-{{ $index }}">
-                            <img src="{{ asset('storage/'.$photo) }}" alt="Photo">
+                            <img src="{{ storage_url($photo) }}" alt="Photo">
                             <button type="button" class="remove-photo" title="Supprimer cette photo"
                                     onclick="deleteExistingPhoto({{ $ad->id }}, {{ $index }}, this)">
                                 <i class="fas fa-times"></i>

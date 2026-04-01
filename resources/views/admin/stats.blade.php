@@ -347,7 +347,7 @@
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 @if($u->avatar)
-                                    <img src="{{ asset('storage/' . $u->avatar) }}" alt="" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+                                    <img src="{{ storage_url($u->avatar) }}" alt="" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                                 @else
                                     <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 700; background: {{ $u->is_verified ? '#10b981' : '#94a3b8' }};">
                                         {{ strtoupper(substr($u->name, 0, 1)) }}

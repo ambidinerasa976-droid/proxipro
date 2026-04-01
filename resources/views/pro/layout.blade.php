@@ -614,7 +614,7 @@
             <div class="dropdown">
                 <a href="#" class="pro-user-menu dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     @if(Auth::user()->avatar)
-                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" class="pro-user-avatar" alt="">
+                        <img src="{{ storage_url(Auth::user()->avatar) }}" class="pro-user-avatar" alt="">
                     @else
                         <div class="pro-user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                     @endif

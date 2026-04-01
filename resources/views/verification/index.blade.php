@@ -314,7 +314,7 @@
                             </span>
                             <div class="d-flex align-items-center gap-3">
                                 @if($verification->document_front && $verification->document_front_status === 'approved')
-                                    <img src="{{ asset('storage/' . $verification->document_front) }}" class="existing-doc-preview" alt="Recto">
+                                    <img src="{{ storage_url($verification->document_front) }}" class="existing-doc-preview" alt="Recto">
                                 @endif
                                 <div>
                                     <h6 class="fw-bold mb-1">Recto du document</h6>
@@ -345,7 +345,7 @@
                             </span>
                             <div class="d-flex align-items-center gap-3">
                                 @if($verification->document_back_status === 'approved')
-                                    <img src="{{ asset('storage/' . $verification->document_back) }}" class="existing-doc-preview" alt="Verso">
+                                    <img src="{{ storage_url($verification->document_back) }}" class="existing-doc-preview" alt="Verso">
                                 @endif
                                 <div>
                                     <h6 class="fw-bold mb-1">Verso du document</h6>
@@ -376,7 +376,7 @@
                             </span>
                             <div class="d-flex align-items-center gap-3">
                                 @if($verification->selfie && $verification->selfie_status === 'approved')
-                                    <img src="{{ asset('storage/' . $verification->selfie) }}" class="existing-doc-preview" alt="Selfie">
+                                    <img src="{{ storage_url($verification->selfie) }}" class="existing-doc-preview" alt="Selfie">
                                 @endif
                                 <div>
                                     <h6 class="fw-bold mb-1">Selfie avec document</h6>
@@ -407,7 +407,7 @@
                             </span>
                             <div class="d-flex align-items-center gap-3">
                                 @if($verification->professional_document_status === 'approved')
-                                    <img src="{{ asset('storage/' . $verification->professional_document) }}" class="existing-doc-preview" alt="Doc pro">
+                                    <img src="{{ storage_url($verification->professional_document) }}" class="existing-doc-preview" alt="Doc pro">
                                 @endif
                                 <div>
                                     <h6 class="fw-bold mb-1">{{ $verification->getProfessionalDocumentLabel() }}</h6>

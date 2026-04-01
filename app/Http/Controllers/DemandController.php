@@ -262,7 +262,7 @@ class DemandController extends Controller
                 return [
                     'id' => $pro->id,
                     'name' => $pro->name,
-                    'avatar' => $pro->avatar ? asset('storage/' . $pro->avatar) : null,
+                    'avatar' => $pro->avatar ? storage_url($pro->avatar) : null,
                     'profession' => $pro->profession,
                     'city' => $pro->city,
                     'bio' => \Str::limit($pro->bio, 120),

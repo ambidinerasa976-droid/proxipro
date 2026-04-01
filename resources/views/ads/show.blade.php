@@ -151,16 +151,16 @@
                         
                         @if($photoCount > 0)
                             @if($photoCount === 1)
-                                <img src="{{ asset('storage/'.$photos[0]) }}" alt="Photo" id="main-photo" style="cursor: pointer;" onclick="openLightbox(0)">
+                                <img src="{{ storage_url($photos[0]) }}" alt="Photo" id="main-photo" style="cursor: pointer;" onclick="openLightbox(0)">
                             @else
                                 <div class="photo-gallery" style="display: grid; grid-template-columns: 2fr 1fr; gap: 4px; width: 100%; height: 100%;">
                                     <div class="main-photo" style="cursor: pointer;" onclick="openLightbox(0)">
-                                        <img src="{{ asset('storage/'.$photos[0]) }}" alt="Photo 1" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="{{ storage_url($photos[0]) }}" alt="Photo 1" style="width: 100%; height: 100%; object-fit: cover;">
                                     </div>
                                     <div class="side-photos" style="display: flex; flex-direction: column; gap: 4px;">
                                         @foreach(array_slice($photos, 1, 2) as $index => $photo)
                                         <div class="side-photo" style="flex: 1; position: relative; cursor: pointer;" onclick="openLightbox({{ $index + 1 }})">
-                                            <img src="{{ asset('storage/'.$photo) }}" alt="Photo {{ $index + 2 }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            <img src="{{ storage_url($photo) }}" alt="Photo {{ $index + 2 }}" style="width: 100%; height: 100%; object-fit: cover;">
                                             @if($index === 1 && $photoCount > 3)
                                             <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">
                                                 +{{ $photoCount - 3 }}
@@ -195,7 +195,7 @@
                     </div>
                     
                     <script>
-                        const photos = @json(array_map(fn($p) => asset('storage/'.$p), $photos));
+                        const photos = @json(array_map(fn($p) => storage_url($p), $photos));
                         let currentPhotoIndex = 0;
                         
                         function openLightbox(index) {
@@ -481,7 +481,7 @@
                     <div class="d-flex gap-3">
                         <div class="flex-shrink-0">
                             @if(Auth::user()->avatar)
-                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" 
+                                <img src="{{ storage_url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" 
                                      style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
                             @else
                                 <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
@@ -520,7 +520,7 @@
                         <div class="d-flex gap-3">
                             <div class="flex-shrink-0">
                                 @if($comment->user && $comment->user->avatar)
-                                    <img src="{{ asset('storage/' . $comment->user->avatar) }}" alt="{{ $comment->user->name }}" 
+                                    <img src="{{ storage_url($comment->user->avatar) }}" alt="{{ $comment->user->name }}" 
                                          style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                                 @else
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">
@@ -554,7 +554,7 @@
                                         <div class="d-flex gap-2">
                                             <div class="flex-shrink-0">
                                                 @if($reply->user && $reply->user->avatar)
-                                                    <img src="{{ asset('storage/' . $reply->user->avatar) }}" alt="{{ $reply->user->name }}" 
+                                                    <img src="{{ storage_url($reply->user->avatar) }}" alt="{{ $reply->user->name }}" 
                                                          style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                                                 @else
                                                     <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #9333ea); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.75rem;">

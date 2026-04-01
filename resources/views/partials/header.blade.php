@@ -100,7 +100,7 @@
                 <div class="dropdown">
                     <button class="user-dropdown-modern d-flex align-items-center border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         @if(Auth::user()->avatar)
-                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="user-avatar">
+                            <img src="{{ storage_url(Auth::user()->avatar) }}" alt="Avatar" class="user-avatar">
                         @else
                             <div class="user-avatar-placeholder">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -113,7 +113,7 @@
                         <li class="px-3 py-2 border-bottom">
                             <div class="d-flex align-items-center">
                                 @if(Auth::user()->avatar)
-                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="" class="user-avatar me-2">
+                                    <img src="{{ storage_url(Auth::user()->avatar) }}" alt="" class="user-avatar me-2">
                                 @else
                                     <div class="user-avatar-placeholder me-2">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                                 @endif

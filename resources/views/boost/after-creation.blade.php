@@ -547,7 +547,7 @@
         <div class="ad-summary">
             <div class="ad-summary-img">
                 @if($ad->photos && count($ad->photos) > 0)
-                    <img src="{{ asset('storage/' . $ad->photos[0]) }}" alt="{{ $ad->title }}">
+                    <img src="{{ storage_url($ad->photos[0]) }}" alt="{{ $ad->title }}">
                 @else
                     <i class="fas fa-image"></i>
                 @endif

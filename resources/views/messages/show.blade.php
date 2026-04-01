@@ -693,7 +693,7 @@
                     <div class="conv-avatar">
                         <div class="conv-avatar-circle">
                             @if($convOtherUser && $convOtherUser->avatar)
-                                <img src="{{ asset('storage/' . $convOtherUser->avatar) }}" alt="{{ $convOtherUser->name }}">
+                                <img src="{{ storage_url($convOtherUser->avatar) }}" alt="{{ $convOtherUser->name }}">
                             @else
                                 {{ strtoupper(substr($convOtherUser->name ?? 'U', 0, 1)) }}
                             @endif
@@ -729,7 +729,7 @@
                     </a>
                     <div class="chat-user-avatar">
                         @if($otherUser && $otherUser->avatar)
-                            <img src="{{ asset('storage/' . $otherUser->avatar) }}" alt="{{ $otherUser->name }}">
+                            <img src="{{ storage_url($otherUser->avatar) }}" alt="{{ $otherUser->name }}">
                         @else
                             {{ strtoupper(substr($otherUser->name ?? 'U', 0, 1)) }}
                         @endif

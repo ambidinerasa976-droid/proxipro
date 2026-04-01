@@ -82,7 +82,7 @@
                     <tr>
                         <td class="ps-4">
                             @if($ad->image)
-                                <img src="{{ asset('storage/' . $ad->image) }}" alt="{{ $ad->title }}" 
+                                <img src="{{ storage_url($ad->image) }}" alt="{{ $ad->title }}" 
                                      style="width: 60px; height: 40px; object-fit: cover; border-radius: 6px;">
                             @else
                                 <div class="bg-light d-flex align-items-center justify-content-center" 

@@ -134,7 +134,7 @@
                 <h6 class="fw-bold mb-3">Photo de profil</h6>
                 <div id="avatarPreview" style="width: 140px; height: 140px; border-radius: 16px; background: linear-gradient(135deg, #a855f7, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(99,102,241,0.18); border: 3px solid #e2e8f0;">
                     @if($user->avatar)
-                        <img id="avatarImg" src="{{ asset('storage/' . $user->avatar) }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
+                        <img id="avatarImg" src="{{ storage_url($user->avatar) }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar">
                     @else
                         <span id="avatarInitial">{{ strtoupper(substr($user->first_name ?? $user->name, 0, 1)) }}</span>
                         <img id="avatarImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" alt="Avatar">

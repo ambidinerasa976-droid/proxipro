@@ -492,7 +492,7 @@
                 <div class="user-profile">
                     <div class="user-avatar-main">
                         @if(Auth::user()->avatar)
-                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar">
+                            <img src="{{ storage_url(Auth::user()->avatar) }}" alt="Avatar">
                         @else
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         @endif
@@ -540,7 +540,7 @@
                     <div class="conv-avatar">
                         <div class="conv-avatar-circle">
                             @if($otherUser && $otherUser->avatar)
-                                <img src="{{ asset('storage/' . $otherUser->avatar) }}" alt="{{ $otherUser->name }}">
+                                <img src="{{ storage_url($otherUser->avatar) }}" alt="{{ $otherUser->name }}">
                             @else
                                 {{ strtoupper(substr($otherUser->name ?? 'U', 0, 1)) }}
                             @endif

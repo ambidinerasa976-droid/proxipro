@@ -8,7 +8,7 @@
     <meta property="og:title" content="{{ $user->name }}{{ $user->profession ? ' — ' . $user->profession : '' }} | ProxiPro">
     <meta property="og:description" content="{{ $user->bio ? Str::limit($user->bio, 160) : ($user->profession ? $user->profession . ' sur ProxiPro. ' : '') . ($user->city ? 'Basé à ' . $user->city . '. ' : '') . 'Retrouvez ce professionnel sur ProxiPro.' }}">
     @if($user->avatar)
-        <meta property="og:image" content="{{ asset('storage/' . $user->avatar) }}">
+        <meta property="og:image" content="{{ storage_url($user->avatar) }}">
     @else
         <meta property="og:image" content="{{ asset('favicon.ico') }}">
     @endif
@@ -20,7 +20,7 @@
     <meta name="twitter:title" content="{{ $user->name }}{{ $user->profession ? ' — ' . $user->profession : '' }} | ProxiPro">
     <meta name="twitter:description" content="{{ $user->bio ? Str::limit($user->bio, 160) : 'Profil professionnel sur ProxiPro.' }}">
     @if($user->avatar)
-        <meta name="twitter:image" content="{{ asset('storage/' . $user->avatar) }}">
+        <meta name="twitter:image" content="{{ storage_url($user->avatar) }}">
     @endif
 @endpush
 
@@ -33,7 +33,7 @@
                 <div class="card-body text-center py-5">
                     <!-- Avatar en format carte -->
                     @if($user->avatar)
-                        <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" 
+                        <img src="{{ storage_url($user->avatar) }}" alt="Avatar" 
                             class="mb-4" style="width: 180px; height: 180px; object-fit: cover; border-radius: 12px;">
                     @else
                         <div class="bg-primary text-white d-inline-flex align-items-center justify-content-center mb-4" 
@@ -390,7 +390,7 @@
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center p-3 bg-light rounded-3 h-100">
                                         @if($ad->photos && count($ad->photos) > 0)
-                                            <img src="{{ asset('storage/' . $ad->photos[0]) }}" alt="" 
+                                            <img src="{{ storage_url($ad->photos[0]) }}" alt="" 
                                                  class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
                                         @else
                                             <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 

@@ -5,7 +5,7 @@
         <div class="mission-card-header">
             <a href="{{ $ad->user ? route('profile.public', $ad->user) : '#' }}" class="mission-user-avatar">
                 @if($ad->user?->avatar)
-                    <img src="{{ asset('storage/' . $ad->user->avatar) }}" alt="{{ $ad->user->name }}">
+                    <img src="{{ storage_url($ad->user->avatar) }}" alt="{{ $ad->user->name }}">
                 @else
                     <div class="mission-user-avatar-placeholder">{{ strtoupper(substr($ad->user?->name ?? 'U', 0, 1)) }}</div>
                 @endif
@@ -64,7 +64,7 @@
             @if($photoCount > 0)
             <div class="mission-photos {{ $photoCount == 1 ? 'single-photo' : ($photoCount == 2 ? 'two-photos' : '') }}">
                 @foreach(array_slice($photos, 0, 2) as $index => $photo)
-                @php $photoUrl = asset('storage/' . $photo); @endphp
+                @php $photoUrl = storage_url($photo); @endphp
                 <div class="mission-photo" onclick="openPhotoLightbox('{{ $photoUrl }}', '{{ addslashes($ad->title) }}')" style="cursor: pointer;">
                     <img src="{{ $photoUrl }}" alt="{{ $ad->title }}" loading="lazy"
                          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
@@ -144,7 +144,7 @@
                 <div class="comment-input-wrapper">
                     <div class="comment-user-avatar">
                         @if(auth()->user()->avatar)
-                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}">
+                            <img src="{{ storage_url(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}">
                         @else
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         @endif

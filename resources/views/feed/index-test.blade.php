@@ -537,9 +537,9 @@
                         <div class="listing-card">
                             <div class="listing-img-box">
                                 @if($ad->photos && is_array($ad->photos) && count($ad->photos) > 0)
-                                    <img src="{{ asset('storage/' . $ad->photos[0]) }}" alt="{{ $ad->title }}">
+                                    <img src="{{ storage_url($ad->photos[0]) }}" alt="{{ $ad->title }}">
                                 @elseif($ad->photos && is_string($ad->photos))
-                                    <img src="{{ asset('storage/' . json_decode($ad->photos)[0] ?? $ad->photos) }}" alt="{{ $ad->title }}">
+                                    <img src="{{ storage_url(json_decode($ad->photos)[0] ?? $ad->photos) }}" alt="{{ $ad->title }}">
                                 @else
                                     <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
                                         <i class="fas fa-image fa-2x"></i>
@@ -558,7 +558,7 @@
                             </div>
                             <div class="listing-footer">
                                 <div class="user-mini">
-                                    <div class="user-avatar-sm" style="background-image: url('{{ $ad->user?->avatar ? asset('storage/'.$ad->user->avatar) : '' }}'); background-size: cover;"></div>
+                                    <div class="user-avatar-sm" style="background-image: url('{{ $ad->user?->avatar ? storage_url($ad->user->avatar) : '' }}'); background-size: cover;"></div>
                                     <span>{{ Str::limit($ad->user?->name ?? 'Utilisateur', 12) }}</span>
                                 </div>
                                 <a href="{{ route('ads.show', $ad->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Voir</a>

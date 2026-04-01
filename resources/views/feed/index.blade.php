@@ -5242,7 +5242,7 @@
                 <a href="{{ route('profile.public', $pro->id) }}" class="provider-card">
                     <div class="provider-image-wrapper">
                         @if($pro->avatar)
-                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}">
+                            <img src="{{ storage_url($pro->avatar) }}" alt="{{ $pro->name }}">
                         @else
                             <div class="provider-image-placeholder">
                                 {{ strtoupper(substr($pro->name, 0, 1)) }}
@@ -5476,7 +5476,7 @@
                                 <a href="{{ route('profile.public', $pro->id) }}" style="display: flex; align-items: center; gap: 10px; padding: 8px 0; text-decoration: none; border-bottom: 1px solid #f3f4f6; {{ $index == $topPros->count() - 1 ? 'border-bottom: none;' : '' }}">
                                     <div style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
                                         @if($pro->avatar)
-                                            <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            <img src="{{ storage_url($pro->avatar) }}" alt="{{ $pro->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                                         @else
                                             <div style="width: 100%; height: 100%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; color: #6b7280; font-weight: 600; font-size: 0.75rem;">
                                                 {{ strtoupper(substr($pro->name, 0, 1)) }}
@@ -5517,7 +5517,7 @@
                     <div class="create-post-inner">
                         <div class="create-post-avatar">
                             @if(Auth::user()->avatar)
-                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                                <img src="{{ storage_url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
                             @else
                                 <div class="create-post-avatar-placeholder">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                             @endif
@@ -5565,7 +5565,7 @@
                                 @endif
                                 <div class="urgent-card-img">
                                     @if(count($uPhotos) > 0)
-                                        <img src="{{ asset('storage/' . $uPhotos[0]) }}" alt="{{ $uAd->title }}">
+                                        <img src="{{ storage_url($uPhotos[0]) }}" alt="{{ $uAd->title }}">
                                     @else
                                         <i class="fas fa-image"></i>
                                     @endif
@@ -5616,7 +5616,7 @@
                         <a href="{{ route('profile.public', $sPro->id) }}" class="provider-card">
                             <div class="provider-image-wrapper">
                                 @if($sPro->avatar)
-                                    <img src="{{ asset('storage/' . $sPro->avatar) }}" alt="{{ $sPro->name }}">
+                                    <img src="{{ storage_url($sPro->avatar) }}" alt="{{ $sPro->name }}">
                                 @else
                                     <div class="provider-image-placeholder">{{ strtoupper(substr($sPro->name, 0, 1)) }}</div>
                                 @endif
@@ -5671,8 +5671,8 @@
                     $p = trim($p); $p = ltrim($p, '/');
                     if (str_starts_with($p, 'http://') || str_starts_with($p, 'https://')) { $photoUrls[] = $p; }
                     elseif (str_starts_with($p, 'storage/')) { $photoUrls[] = asset($p); }
-                    elseif (str_starts_with($p, 'public/')) { $photoUrls[] = asset('storage/' . str_replace('public/', '', $p)); }
-                    else { $photoUrls[] = asset('storage/' . $p); }
+                    elseif (str_starts_with($p, 'public/')) { $photoUrls[] = storage_url(str_replace('public/', '', $p)); }
+                    else { $photoUrls[] = storage_url($p); }
                 }
                 $isNew = $ad->created_at->diffInHours() < 24;
                 $hasProBadge = $ad->user && ($ad->user->user_type === 'professionnel' || $ad->user->hasActiveProSubscription());
@@ -5716,7 +5716,7 @@
                 <div class="fb-post-header">
                     <a href="{{ $ad->user ? route('profile.public', $ad->user->id) : '#' }}" class="fb-post-avatar">
                         @if($ad->user && $ad->user->avatar)
-                            <img src="{{ asset('storage/' . $ad->user->avatar) }}" alt="{{ $ad->user->name }}">
+                            <img src="{{ storage_url($ad->user->avatar) }}" alt="{{ $ad->user->name }}">
                         @else
                             <div class="fb-post-avatar-placeholder">{{ strtoupper(substr($ad->user->name ?? 'U', 0, 1)) }}</div>
                         @endif
@@ -5874,7 +5874,7 @@
                     <form class="fb-comment-form" onsubmit="submitComment(event, {{ $ad->id }})">
                         <div class="fb-comment-avatar">
                             @if(Auth::user()->avatar)
-                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
+                                <img src="{{ storage_url(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}">
                             @else
                                 <div class="fb-post-avatar-placeholder" style="width:32px;height:32px;font-size:0.8rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                             @endif
@@ -6413,7 +6413,7 @@
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <div id="wizProfileAvatarPreview" style="width:36px; height:36px; border-radius:50%; background:#e5e7eb; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
                                     @if($user->avatar)
-                                        <img src="{{ asset('storage/' . $user->avatar) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        <img src="{{ storage_url($user->avatar) }}" style="width:100%; height:100%; object-fit:cover;">
                                     @else
                                         <i class="fas fa-user" style="color:#9ca3af; font-size:0.85rem;"></i>
                                     @endif

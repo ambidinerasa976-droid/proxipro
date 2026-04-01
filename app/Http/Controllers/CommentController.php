@@ -81,7 +81,7 @@ class CommentController extends Controller
                     'user' => [
                         'id' => $comment->user->id,
                         'name' => $comment->user->name,
-                        'avatar' => $comment->user->avatar ? asset('storage/' . $comment->user->avatar) : null,
+                        'avatar' => $comment->user->avatar ? storage_url($comment->user->avatar) : null,
                         'initial' => strtoupper(substr($comment->user->name, 0, 1)),
                     ],
                 ],
@@ -151,7 +151,7 @@ class CommentController extends Controller
                     'user' => [
                         'id' => $comment->user->id,
                         'name' => $comment->user->name,
-                        'avatar' => $comment->user->avatar ? asset('storage/' . $comment->user->avatar) : null,
+                        'avatar' => $comment->user->avatar ? storage_url($comment->user->avatar) : null,
                         'initial' => strtoupper(substr($comment->user->name, 0, 1)),
                     ],
                     'replies' => $comment->replies->map(function ($reply) {
@@ -162,7 +162,7 @@ class CommentController extends Controller
                             'user' => [
                                 'id' => $reply->user->id,
                                 'name' => $reply->user->name,
-                                'avatar' => $reply->user->avatar ? asset('storage/' . $reply->user->avatar) : null,
+                                'avatar' => $reply->user->avatar ? storage_url($reply->user->avatar) : null,
                                 'initial' => strtoupper(substr($reply->user->name, 0, 1)),
                             ],
                         ];

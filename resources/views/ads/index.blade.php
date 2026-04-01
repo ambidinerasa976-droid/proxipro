@@ -218,7 +218,7 @@
                                             </span>
                                         @endif
                                         @if(!empty($ad->photos) && isset($ad->photos[0]))
-                                            <img src="{{ asset('storage/'.$ad->photos[0]) }}" alt="Photo">
+                                            <img src="{{ storage_url($ad->photos[0]) }}" alt="Photo">
                                         @else
                                             <i class="fas fa-image"></i>
                                         @endif

@@ -24,7 +24,7 @@
                         <a href="{{ route('profile.public', $pro->id) }}" class="pro-card-large">
                             <div class="pro-photo-container">
                                 @if($pro->avatar)
-                                    <img src="{{ asset('storage/' . $pro->avatar) }}" alt="{{ $pro->name }}" class="pro-photo">
+                                    <img src="{{ storage_url($pro->avatar) }}" alt="{{ $pro->name }}" class="pro-photo">
                                 @else
                                     <div class="pro-photo-placeholder">
                                         <i class="fas fa-user"></i>

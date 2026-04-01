@@ -20,7 +20,7 @@
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
                                 @if($user->avatar)
-                                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" 
+                                    <img src="{{ storage_url($user->avatar) }}" alt="Avatar" 
                                          class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;" id="avatarPreview">
                                 @else
                                     <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" 

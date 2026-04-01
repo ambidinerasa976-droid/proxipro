@@ -544,8 +544,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::delete('/reports/{id}', [AdminController::class, 'deleteReport'])->name('admin.reports.delete');
 });
 
-// Route de secours pour les images (car FAT32 ne supporte pas les liens symboliques)
+// Route de secours pour les images (disque local uniquement)
+// Quand FILESYSTEM_PUBLIC_DRIVER=s3, les images sont servies directement par R2/S3.
 Route::get('storage/{path}', function ($path) {
+    // Sécurité : empêcher la traversée de répertoire
+    if (str_contains($path, '..')) {
+        abort(403);
+    }
+
+    // Si le disque public est S3, rediriger vers l'URL S3
+    if (config('filesystems.disks.public.driver') === 's3') {
+        return redirect(\Illuminate\Support\Facades\Storage::disk('public')->url($path));
+    }
+
     $filePath = storage_path('app/public/' . $path);
     if (!file_exists($filePath)) {
         abort(404);

@@ -114,7 +114,7 @@
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         @if($pv->user && $pv->user->avatar)
-                                            <img src="{{ asset('storage/' . $pv->user->avatar) }}" alt="" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+                                            <img src="{{ storage_url($pv->user->avatar) }}" alt="" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                                         @else
                                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 600;">
                                                 {{ $pv->user ? strtoupper(substr($pv->user->name, 0, 1)) : '?' }}

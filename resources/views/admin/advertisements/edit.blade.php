@@ -79,7 +79,7 @@
                         <label class="form-label fw-semibold">Image</label>
                         @if($advertisement->image)
                             <div class="mb-2">
-                                <img src="{{ asset('storage/' . $advertisement->image) }}" alt="{{ $advertisement->title }}" 
+                                <img src="{{ storage_url($advertisement->image) }}" alt="{{ $advertisement->title }}" 
                                      style="max-width: 200px; border-radius: 8px;">
                             </div>
                         @endif

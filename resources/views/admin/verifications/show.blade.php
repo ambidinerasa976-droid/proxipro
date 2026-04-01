@@ -127,7 +127,7 @@
                 @if($verification->user)
                     <div class="text-center mb-3">
                         @if($verification->user->avatar)
-                            <img src="{{ asset('storage/' . $verification->user->avatar) }}" alt="" class="rounded-circle mb-2" style="width: 72px; height: 72px; object-fit: cover;">
+                            <img src="{{ storage_url($verification->user->avatar) }}" alt="" class="rounded-circle mb-2" style="width: 72px; height: 72px; object-fit: cover;">
                         @else
                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 72px; height: 72px; font-size: 1.5rem; font-weight: 600;">
                                 {{ strtoupper(substr($verification->user->name, 0, 1)) }}
@@ -309,14 +309,14 @@
                                 <div style="background: #f8f9fa; min-height: 200px;">
                                     @php $frontExt = strtolower(pathinfo($verification->document_front, PATHINFO_EXTENSION)); @endphp
                                     @if(in_array($frontExt, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                        <img src="{{ asset('storage/' . $verification->document_front) }}" 
+                                        <img src="{{ storage_url($verification->document_front) }}" 
                                              alt="Document recto" class="img-fluid w-100" 
                                              style="cursor: pointer; object-fit: contain; max-height: 250px;"
                                              onclick="openImageModal(this.src, 'Recto du document')">
                                     @else
                                         <div class="p-4 text-center">
                                             <i class="fas fa-file-pdf fa-3x text-danger mb-2 d-block"></i>
-                                            <a href="{{ asset('storage/' . $verification->document_front) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ storage_url($verification->document_front) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-external-link-alt me-1"></i>Ouvrir le document PDF
                                             </a>
                                         </div>
@@ -362,14 +362,14 @@
                                 <div style="background: #f8f9fa; min-height: 200px;">
                                     @php $backExt = strtolower(pathinfo($verification->document_back, PATHINFO_EXTENSION)); @endphp
                                     @if(in_array($backExt, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                        <img src="{{ asset('storage/' . $verification->document_back) }}" 
+                                        <img src="{{ storage_url($verification->document_back) }}" 
                                              alt="Document verso" class="img-fluid w-100" 
                                              style="cursor: pointer; object-fit: contain; max-height: 250px;"
                                              onclick="openImageModal(this.src, 'Verso du document')">
                                     @else
                                         <div class="p-4 text-center">
                                             <i class="fas fa-file-pdf fa-3x text-danger mb-2 d-block"></i>
-                                            <a href="{{ asset('storage/' . $verification->document_back) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ storage_url($verification->document_back) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-external-link-alt me-1"></i>Ouvrir le document PDF
                                             </a>
                                         </div>
@@ -413,14 +413,14 @@
                                 <div style="background: #f8f9fa; min-height: 200px;">
                                     @php $selfieExt = strtolower(pathinfo($verification->selfie, PATHINFO_EXTENSION)); @endphp
                                     @if(in_array($selfieExt, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                        <img src="{{ asset('storage/' . $verification->selfie) }}" 
+                                        <img src="{{ storage_url($verification->selfie) }}" 
                                              alt="Selfie" class="img-fluid w-100" 
                                              style="cursor: pointer; object-fit: contain; max-height: 250px;"
                                              onclick="openImageModal(this.src, 'Selfie de vérification')">
                                     @else
                                         <div class="p-4 text-center">
                                             <i class="fas fa-file-pdf fa-3x text-danger mb-2 d-block"></i>
-                                            <a href="{{ asset('storage/' . $verification->selfie) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ storage_url($verification->selfie) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-external-link-alt me-1"></i>Ouvrir le document PDF
                                             </a>
                                         </div>
@@ -485,14 +485,14 @@
                                         $ext = strtolower(pathinfo($verification->professional_document, PATHINFO_EXTENSION));
                                     @endphp
                                     @if(in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                        <img src="{{ asset('storage/' . $verification->professional_document) }}" 
+                                        <img src="{{ storage_url($verification->professional_document) }}" 
                                              alt="Document pro" class="img-fluid w-100" 
                                              style="cursor: pointer; object-fit: contain; max-height: 250px;"
                                              onclick="openImageModal(this.src, 'Document professionnel')">
                                     @else
                                         <div class="p-4 text-center">
                                             <i class="fas fa-file-pdf fa-3x text-danger mb-2 d-block"></i>
-                                            <a href="{{ asset('storage/' . $verification->professional_document) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ storage_url($verification->professional_document) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-download me-1"></i>Télécharger le document
                                             </a>
                                         </div>

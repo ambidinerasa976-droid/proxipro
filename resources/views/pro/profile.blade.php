@@ -27,7 +27,7 @@
     <div class="d-flex align-items-start gap-4 flex-wrap">
         <div class="text-center">
             @if($user->avatar)
-                <img src="{{ asset('storage/' . $user->avatar) }}" alt="" style="width: 100px; height: 100px; border-radius: 16px; object-fit: cover; border: 3px solid var(--pro-primary);">
+                <img src="{{ storage_url($user->avatar) }}" alt="" style="width: 100px; height: 100px; border-radius: 16px; object-fit: cover; border: 3px solid var(--pro-primary);">
             @else
                 <div style="width: 100px; height: 100px; border-radius: 16px; background: var(--pro-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800;">
                     {{ strtoupper(substr($user->name, 0, 1)) }}
