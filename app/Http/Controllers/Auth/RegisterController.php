@@ -130,15 +130,14 @@ class RegisterController extends Controller
                     ->with('success', 'Un code de vérification a été envoyé à votre adresse e-mail.');
             }
 
-            // Email failed to send: auto-verify and let user in to avoid blocking
-            Log::warning('Email send failed, auto-verifying user to prevent registration block', [
+            // Email failed: still redirect to verification page so user can request a resend
+            // Do NOT auto-verify — the code stays in DB for when email is resent
+            Log::warning('Email send failed, redirecting to verification page for manual resend', [
                 'user_id' => $user->id,
                 'email' => $user->email,
             ]);
-            $user->email_verified_at = now();
-            $user->email_verification_code = null;
-            $user->email_verification_code_expires_at = null;
-            $user->save();
+            return redirect()->route('verification.code.show', ['email' => $user->email])
+                ->with('warning', 'L\'envoi du code a échoué. Veuillez cliquer sur "Renvoyer le code" pour réessayer.');
         } else {
             // Verification disabled: mark as verified immediately
             $user->email_verified_at = now();
