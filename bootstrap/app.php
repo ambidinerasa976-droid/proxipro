@@ -13,7 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        $middleware->trustHosts(at: ['*']);
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'geo' => \App\Http\Middleware\DetectUserGeolocation::class,
