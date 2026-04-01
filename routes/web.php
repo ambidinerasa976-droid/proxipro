@@ -107,6 +107,27 @@ Route::get('/debug-railway', function () {
     return response()->json($results, 200, [], JSON_PRETTY_PRINT);
 })->name('debug-railway');
 
+// Temporary: promote admin user (remove after use)
+Route::get('/setup-admin', function () {
+    $email = config('admin.principal_admin.email');
+    if (empty($email)) {
+        return response()->json(['error' => 'PRINCIPAL_ADMIN_EMAIL not set']);
+    }
+    $user = \App\Models\User::where('email', $email)->first();
+    if (!$user) {
+        return response()->json(['error' => "User {$email} not found. Register first, then visit this URL again."]);
+    }
+    $user->role = 'admin';
+    $user->is_verified = true;
+    $user->is_active = true;
+    $user->save();
+    return response()->json([
+        'success' => true,
+        'message' => "{$email} is now admin. Log out and log back in to see the admin button.",
+        'role' => $user->role,
+    ]);
+})->name('setup-admin');
+
 // Page d'accueil publique
 Route::get('/', [HomePageController::class, 'index'])->name('homepage');
 
