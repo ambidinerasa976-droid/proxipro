@@ -3,7 +3,7 @@ cmds = [
   # Create a minimal .env so Laravel can boot during the build phase.
   # On Railway, the real environment variables are injected at runtime;
   # this file is only needed to satisfy artisan commands that run during build.
-  "cp .env.example .env || true",
+  "[ ! -f .env ] && cp .env.example .env || true",
   # Ensure the SQLite file exists so package:discover (triggered by composer)
   # does not crash when DB_CONNECTION=sqlite is the build-time fallback.
   "mkdir -p database && touch database/database.sqlite",

@@ -111,16 +111,25 @@ class RegisterController extends Controller
             $user->email_verification_code_expires_at = now()->addMinutes(15);
             $user->save();
 
-            // Send verification code email with robust error handling
+            // Send verification code email synchronously (critical — must not be queued)
             $emailSent = false;
             try {
+                Log::info('Sending verification code email', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'mail_driver' => config('mail.default'),
+                    'mail_host' => config('mail.mailers.smtp.host'),
+                    'queue_driver' => config('queue.default'),
+                ]);
                 Mail::to($user->email)->send(new EmailVerificationCode($code, $user->name));
                 $emailSent = true;
+                Log::info('Verification code email sent successfully', ['email' => $user->email]);
             } catch (\Exception $e) {
                 Log::error('Verification code email FAILED: ' . $e->getMessage(), [
                     'user_id' => $user->id,
                     'email' => $user->email,
                     'exception' => get_class($e),
+                    'trace' => $e->getTraceAsString(),
                 ]);
             }
 

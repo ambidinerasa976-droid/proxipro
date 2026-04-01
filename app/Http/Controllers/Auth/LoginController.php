@@ -97,11 +97,19 @@ class LoginController extends Controller
 
             $emailSent = false;
             try {
+                Log::info('Sending verification code email on login', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'mail_driver' => config('mail.default'),
+                ]);
                 Mail::to($user->email)->send(new EmailVerificationCode($code, $user->name));
                 $emailSent = true;
+                Log::info('Verification code email sent on login', ['email' => $user->email]);
             } catch (\Exception $e) {
                 Log::error('Verification code email failed on login: ' . $e->getMessage(), [
                     'user_id' => $user->id,
+                    'email' => $user->email,
+                    'exception' => get_class($e),
                 ]);
             }
 

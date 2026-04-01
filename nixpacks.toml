@@ -6,7 +6,7 @@ cmds = [
     "mkdir -p storage/framework/{sessions,views,cache}",
     "mkdir -p storage/logs",
     "mkdir -p bootstrap/cache",
-    "cp .env.example .env || true",
+    "[ ! -f .env ] && cp .env.example .env || true",
     "mkdir -p database && touch database/database.sqlite",
     "composer install --no-dev --optimize-autoloader --no-interaction",
     "npm ci"

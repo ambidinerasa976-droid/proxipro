@@ -2,13 +2,12 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class EmailVerificationCode extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public string $code;
     public string $userName;
