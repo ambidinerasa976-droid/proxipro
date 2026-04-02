@@ -460,8 +460,8 @@
         outline: none;
         background: transparent;
         resize: none;
-        overflow: hidden;
-        max-height: 150px;
+        overflow-y: auto;
+        max-height: 200px;
         line-height: 1.4;
         display: block;
         height: auto;
@@ -961,7 +961,7 @@
     // Auto-resize textarea and send on Enter (Shift+Enter for newline)
     function autoResize(el) {
         el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+        el.style.height = Math.min(el.scrollHeight, 200) + 'px';
     }
 
     messageInput?.addEventListener('input', function() {

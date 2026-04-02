@@ -101,7 +101,7 @@ class MessageController extends Controller
         $request->validate([
             'recipient_id' => 'required|exists:users,id',
             'ad_id' => 'nullable|exists:ads,id',
-            'message' => 'required|string|max:1000'
+            'message' => 'required|string|max:5000'
         ]);
 
         $currentUser = Auth::user();

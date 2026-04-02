@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\Advertisement;
 use App\Models\IdentityVerification;
 use App\Models\Report;
+use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
@@ -1403,5 +1404,85 @@ class AdminController extends Controller
         $report = Report::findOrFail($id);
         $report->delete();
         return back()->with('success', 'Signalement supprimé.');
+    }
+
+    // ===== CONTACT MESSAGES MANAGEMENT =====
+
+    public function contactMessages(Request $request)
+    {
+        $query = ContactMessage::with('user')->orderBy('created_at', 'desc');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhere('message', 'like', "%{$search}%");
+            });
+        }
+
+        $messages = $query->paginate(15);
+
+        $stats = [
+            'total' => ContactMessage::count(),
+            'pending' => ContactMessage::where('status', 'pending')->count(),
+            'read' => ContactMessage::where('status', 'read')->count(),
+            'replied' => ContactMessage::where('status', 'replied')->count(),
+            'closed' => ContactMessage::where('status', 'closed')->count(),
+        ];
+
+        return view('admin.contact-messages.index', compact('messages', 'stats'));
+    }
+
+    public function showContactMessage($id)
+    {
+        $contactMessage = ContactMessage::with('user')->findOrFail($id);
+
+        if ($contactMessage->status === 'pending') {
+            $contactMessage->update(['status' => 'read']);
+        }
+
+        return view('admin.contact-messages.show', compact('contactMessage'));
+    }
+
+    public function replyContactMessage(Request $request, $id)
+    {
+        $request->validate([
+            'admin_reply' => 'required|string|max:10000',
+        ]);
+
+        $message = ContactMessage::findOrFail($id);
+        $message->update([
+            'admin_reply' => $request->admin_reply,
+            'status' => 'replied',
+            'replied_at' => now(),
+        ]);
+
+        return back()->with('success', 'Réponse envoyée avec succès.');
+    }
+
+    public function updateContactMessageStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,read,replied,closed',
+        ]);
+
+        $message = ContactMessage::findOrFail($id);
+        $message->update(['status' => $request->status]);
+
+        return back()->with('success', 'Statut mis à jour.');
+    }
+
+    public function deleteContactMessage($id)
+    {
+        $message = ContactMessage::findOrFail($id);
+        $message->delete();
+
+        return redirect()->route('admin.contact-messages')->with('success', 'Message supprimé.');
     }
 }

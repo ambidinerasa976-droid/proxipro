@@ -542,6 +542,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/reports/{id}/resolve', [AdminController::class, 'resolveReport'])->name('admin.reports.resolve');
     Route::post('/reports/{id}/dismiss', [AdminController::class, 'dismissReport'])->name('admin.reports.dismiss');
     Route::delete('/reports/{id}', [AdminController::class, 'deleteReport'])->name('admin.reports.delete');
+
+    // Gestion des messages de contact
+    Route::get('/contact-messages', [AdminController::class, 'contactMessages'])->name('admin.contact-messages');
+    Route::get('/contact-messages/{id}', [AdminController::class, 'showContactMessage'])->name('admin.contact-messages.show');
+    Route::post('/contact-messages/{id}/reply', [AdminController::class, 'replyContactMessage'])->name('admin.contact-messages.reply');
+    Route::post('/contact-messages/{id}/status', [AdminController::class, 'updateContactMessageStatus'])->name('admin.contact-messages.status');
+    Route::delete('/contact-messages/{id}', [AdminController::class, 'deleteContactMessage'])->name('admin.contact-messages.delete');
 });
 
 // Route de secours pour les images (disque local uniquement)

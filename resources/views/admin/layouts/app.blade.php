@@ -207,6 +207,17 @@
                 </a>
             </li>
             <li>
+                @php
+                    $pendingContactCount = \App\Models\ContactMessage::where('status', 'pending')->count();
+                @endphp
+                <a href="{{ route('admin.contact-messages') }}" class="{{ request()->routeIs('admin.contact-messages*') ? 'active' : '' }}" style="position: relative;">
+                    <i class="fas fa-envelope me-2" style="color: #3b82f6;"></i> Messages contact
+                    @if($pendingContactCount > 0)
+                        <span class="badge bg-danger rounded-pill" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 0.7rem;">{{ $pendingContactCount }}</span>
+                    @endif
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('admin.settings') }}" class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                     <i class="fas fa-cog me-2"></i> Paramètres
                 </a>
