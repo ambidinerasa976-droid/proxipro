@@ -21,10 +21,10 @@ FROM php:8.2-apache AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip curl libpng-dev libjpeg-dev libfreetype6-dev \
         libonig-dev libxml2-dev libzip-dev libsqlite3-dev \
-        libicu-dev \
+        libicu-dev libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
-        pdo pdo_sqlite pdo_mysql \
+        pdo pdo_sqlite pdo_mysql pdo_pgsql \
         mbstring xml zip gd bcmath intl opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -82,5 +82,5 @@ ENV APP_ENV=production \
 
 EXPOSE 8080
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["apache2-foreground"]

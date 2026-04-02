@@ -41,19 +41,22 @@ fi
 #    These run at startup (not build time) because config:cache
 #    bakes in runtime environment variables supplied by Railway.
 echo "⏳  Caching configuration …"
-php artisan config:cache
-php artisan route:cache
-php artisan view:clear
-php artisan view:cache
+php artisan config:cache --no-interaction || true
+php artisan route:cache --no-interaction || true
+php artisan view:clear --no-interaction || true
+php artisan view:cache --no-interaction || true
 
 # 5. Run database migrations
 echo "⏳  Running migrations …"
-php artisan migrate --force
+php artisan migrate --force --no-interaction || echo "WARNING: Migrations failed, continuing..."
 
-# 6. Create storage symlink if missing
+# 6. Run admin seeder
+php artisan db:seed --class=AdminSeeder --force --no-interaction || true
+
+# 7. Create storage symlink if missing
 if [ ! -L public/storage ]; then
     echo "⏳  Creating storage link …"
-    php artisan storage:link
+    php artisan storage:link --force --no-interaction 2>/dev/null || true
 fi
 
 echo "✅  Entrypoint complete – starting server"
