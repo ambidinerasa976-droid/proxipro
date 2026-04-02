@@ -204,8 +204,7 @@
                                 </ul>
                             </div>
                             
-                            <form action="{{ route('settings.delete-account') }}" method="POST" id="settingsDeleteForm"
-                                  onsubmit="return confirm('Êtes-vous absolument sûr(e) ? Cette action est irréversible et supprimera toutes vos données.')">
+                            <form action="{{ route('settings.delete-account') }}" method="POST" id="settingsDeleteForm">
                                 @csrf
                                 
                                 <div class="mb-3">
