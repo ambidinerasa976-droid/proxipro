@@ -266,8 +266,6 @@ document.getElementById('profile_confirm_delete').addEventListener('change', fun
     document.getElementById('profileConfirmDeleteBtn').disabled = !this.checked;
 });
 
-
-
 // Reopen modal on validation error
 @if($errors->any() && ($errors->has('password') || $errors->has('delete') || $errors->has('confirm_delete')))
     var modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
