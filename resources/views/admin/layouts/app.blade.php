@@ -27,6 +27,8 @@
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
         
         .sidebar-header {
