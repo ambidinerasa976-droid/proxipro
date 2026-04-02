@@ -3692,6 +3692,15 @@
             background: #fef2f2;
             color: #dc2626;
         }
+
+        /* Dropdown scrollable on mobile */
+        @media (max-width: 767.98px) {
+            .dropdown-menu-modern {
+                max-height: 80vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
         
         /* User Avatar */
         .user-avatar {

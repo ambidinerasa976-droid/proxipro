@@ -34,8 +34,8 @@
                                     <img src="" alt="Avatar" class="rounded-circle d-none" 
                                          style="width: 120px; height: 120px; object-fit: cover;" id="avatarPreview">
                                 @endif
-                                <label for="avatar" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2" 
-                                       style="cursor: pointer; width: 36px; height: 36px;">
+                                <label for="avatar" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                       style="cursor: pointer; width: 44px; height: 44px; font-size: 1rem;">
                                     <i class="fas fa-camera"></i>
                                 </label>
                                 <input type="file" id="avatar" name="avatar" class="d-none" accept="image/*">
@@ -180,7 +180,7 @@
 
 {{-- Delete Account Modal --}}
 <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteAccountModalLabel">
@@ -266,12 +266,7 @@ document.getElementById('profile_confirm_delete').addEventListener('change', fun
     document.getElementById('profileConfirmDeleteBtn').disabled = !this.checked;
 });
 
-// Final confirmation
-document.getElementById('profileDeleteAccountForm').addEventListener('submit', function(e) {
-    if (!confirm('Êtes-vous absolument sûr(e) ? Cette action est irréversible et supprimera toutes vos données.')) {
-        e.preventDefault();
-    }
-});
+
 
 // Reopen modal on validation error
 @if($errors->any() && ($errors->has('password') || $errors->has('delete') || $errors->has('confirm_delete')))
